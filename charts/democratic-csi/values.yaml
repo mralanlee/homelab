@@ -14,7 +14,7 @@ democratic-csi:
   driver:
     existingConfigSecret: truenas-iscsi-config
     config:
-      driver: freenas-iscsi
+      driver: freenas-api-iscsi
 
   test:
     enabled: false
