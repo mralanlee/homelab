@@ -13,3 +13,5 @@ democratic-csi:
   
   driver:
     existingConfigSecret: truenas-iscsi-config-secret
+    config:
+      driver: freenas-iscsi
