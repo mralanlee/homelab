@@ -16,13 +16,5 @@ democratic-csi:
     config:
       driver: freenas-iscsi
 
-  controller:
-    driver:
-      image: democraticcsi/democratic-csi:latest
-
-  node:
-    driver:
-      image: democraticcsi/democratic-csi:latest
-
   test:
     enabled: false
