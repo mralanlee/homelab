@@ -41,7 +41,7 @@ traefik:
       entryPoints:
         - websecure
       routes:
-        - match: Host(`traefik.home`)
+        - match: Host(`traefik.k8s.shimmerlabs.xyz`)
           kind: Rule
           services:
             - name: traefik
