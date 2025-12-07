@@ -15,9 +15,11 @@ clusterIssuers:
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     privateKeySecretName: letsencrypt-staging-account-key
     solvers:
-      - http01:
-          ingress:
-            class: traefik
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token
   - name: letsencrypt-prod
     email: certs@shimmerlabs.xyz
     server: https://acme-v02.api.letsencrypt.org/directory
@@ -25,7 +27,6 @@ clusterIssuers:
     solvers:
       - dns01:
           cloudflare:
-            email: alanleunglee@gmail.com
-            apiKeySecretRef:
-              name: cloudflare-api-key
-              key: api-key
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token
