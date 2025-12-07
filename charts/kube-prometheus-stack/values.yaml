@@ -1,0 +1,59 @@
+kube-prometheus-stack:
+  grafana:
+    enabled: false
+
+  prometheus:
+    prometheusSpec:
+      retention: 15d
+      storageSpec:
+        volumeClaimTemplate:
+          metadata:
+            labels:
+              app: prometheus
+          spec:
+            storageClassName: truenas-iscsi
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 50Gi
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      hosts:
+        - prometheus.k8s.shimmerlabs.xyz
+      paths:
+        - /
+      tls:
+        - secretName: wildcard-k8s-shimmerlabs
+          hosts:
+            - prometheus.k8s.shimmerlabs.xyz
+            
+  alertmanager:
+    alertmanagerSpec:
+      storage:
+        volumeClaimTemplate:
+          metadata:
+            labels:
+              app: alertmanager
+          spec:
+            storageClassName: truenas-iscsi
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 10Gi
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      hosts:
+        - alertmanager.k8s.shimmerlabs.xyz
+      paths: [ "/" ]
+      tls:
+        - secretName: wildcard-k8s-shimmerlabs
+          hosts:
+            - alertmanager.k8s.shimmerlabs.xyz

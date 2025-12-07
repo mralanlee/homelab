@@ -1,0 +1,11 @@
+apiVersion: v2
+name: argocd
+description: GitOps control plane for the homelab cluster
+type: application
+version: 0.1.0
+appVersion: "3.2.1"
+dependencies:
+  - name: kube-prometheus-stack
+    version: 79.12.0
+    repository: https://prometheus-community.github.io/helm-charts
+
