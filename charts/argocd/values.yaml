@@ -28,6 +28,7 @@ argo-cd:
       hostname: argocd.k8s.shimmerlabs.xyz
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        cert-manager.io/cluster-issuer: letsencrypt-prod
       paths:
         - /
       https: false

@@ -44,3 +44,5 @@ traefik:
       services:
         - name: api@internal
           kind: TraefikService
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod

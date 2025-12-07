@@ -22,6 +22,7 @@ kube-prometheus-stack:
       ingressClassName: traefik
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        cert-manager.io/cluster-issuer: letsencrypt-prod
       hosts:
         - prometheus.k8s.shimmerlabs.xyz
       paths:
@@ -51,6 +52,7 @@ kube-prometheus-stack:
       ingressClassName: traefik
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        cert-manager.io/cluster-issuer: letsencrypt-prod
       hosts:
         - alertmanager.k8s.shimmerlabs.xyz
       paths:
