@@ -1,0 +1,39 @@
+argo-cd:
+  fullnameOverride: argocd
+  global:
+    logging:
+      level: info
+    securityContext:
+      runAsNonRoot: true
+
+  configs:
+    cm:
+      url: https://argocd.k8s.shimmerlabs.xyz
+    params:
+      server.insecure: true
+
+  controller:
+    replicas: 1
+
+  repoServer:
+    autoscaling:
+      enabled: false
+
+  server:
+    service:
+      type: ClusterIP
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      hostname: argocd.k8s.shimmerlabs.xyz
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      paths:
+        - /
+      https: false
+    extraArgs:
+      - --insecure
+
+  redis:
+    enabled: true
+

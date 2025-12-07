@@ -1,0 +1,11 @@
+apiVersion: v2
+name: argocd
+description: GitOps control plane for the homelab cluster
+type: application
+version: 0.1.0
+appVersion: "3.2.1"
+dependencies:
+  - name: argo-cd
+    version: 9.1.6
+    repository: https://argoproj.github.io/argo-helm
+
