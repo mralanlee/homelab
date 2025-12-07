@@ -41,10 +41,10 @@ traefik:
       entryPoints:
         - websecure
       routes:
-        - match: Host(`traefik.k8s.shimmerlabs.xyz`)
+        - match: Host(`traefik.k8s.shimmerlabs.xyz`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
           kind: Rule
           services:
-            - name: traefik
-              port: 80
+            - name: api@internal
+              kind: TraefikService
           middlewares:
             - name: traefik-dashboard-auth
