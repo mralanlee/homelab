@@ -1,9 +1,9 @@
 apiVersion: v2
-name: argocd
-description: GitOps control plane for the homelab cluster
+name: cert-manager
+description: Automates TLS certificates for the homelab cluster via cert-manager
 type: application
 version: 0.1.0
-appVersion: "3.2.1"
+appVersion: "1.19.1"
 dependencies:
   - name: cert-manager
     version: 1.19.1

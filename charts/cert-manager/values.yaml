@@ -1,39 +1,28 @@
-argo-cd:
-  fullnameOverride: argocd
+cert-manager:
+  installCRDs: true
   global:
-    logging:
-      level: info
-    securityContext:
-      runAsNonRoot: true
+    leaderElection:
+      namespace: cert-manager
+  extraArgs:
+    - --cluster-resource-namespace=$(POD_NAMESPACE)
+    - --enable-certificate-owner-ref=true
+  webhook:
+    timeoutSeconds: 10
 
-  configs:
-    cm:
-      url: https://argocd.k8s.shimmerlabs.xyz
-    params:
-      server.insecure: true
-
-  controller:
-    replicas: 1
-
-  repoServer:
-    autoscaling:
-      enabled: false
-
-  server:
-    service:
-      type: ClusterIP
-    ingress:
-      enabled: true
-      ingressClassName: traefik
-      hostname: argocd.k8s.shimmerlabs.xyz
-      annotations:
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-      paths:
-        - /
-      https: false
-    extraArgs:
-      - --insecure
-
-  redis:
-    enabled: true
-
+clusterIssuers:
+  - name: letsencrypt-staging
+    email: certs@shimmerlabs.xyz
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretName: letsencrypt-staging-account-key
+    solvers:
+      - http01:
+          ingress:
+            class: traefik
+  - name: letsencrypt-prod
+    email: certs@shimmerlabs.xyz
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretName: letsencrypt-prod-account-key
+    solvers:
+      - http01:
+          ingress:
+            class: traefik
