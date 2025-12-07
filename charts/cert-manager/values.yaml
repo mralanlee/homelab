@@ -23,6 +23,9 @@ clusterIssuers:
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretName: letsencrypt-prod-account-key
     solvers:
-      - http01:
-          ingress:
-            class: traefik
+      - dns01:
+          cloudflare:
+            email: alanleunglee@gmail.com
+            apiKeySecretRef:
+              name: cloudflare-api-key
+              key: api-key
