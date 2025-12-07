@@ -40,11 +40,7 @@ traefik:
       enabled: true
       entryPoints:
         - websecure
-      routes:
-        - match: Host(`traefik.k8s.shimmerlabs.xyz`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
-          kind: Rule
-          services:
-            - name: api@internal
-              kind: TraefikService
-          middlewares:
-            - name: traefik-dashboard-auth
+      matchRule: Host(`traefik.k8s.shimmerlabs.xyz`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      services:
+        - name: api@internal
+          kind: TraefikService
