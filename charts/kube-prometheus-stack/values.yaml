@@ -26,8 +26,8 @@ kube-prometheus-stack:
       hosts:
         - prometheus.k8s.shimmerlabs.xyz
       paths:
-        - path: /
-          pathType: Prefix
+        - /
+      pathType: Prefix
       tls:
         - secretName: wildcard-k8s-shimmerlabs
           hosts:
@@ -56,8 +56,8 @@ kube-prometheus-stack:
       hosts:
         - alertmanager.k8s.shimmerlabs.xyz
       paths:
-        - path: /
-          pathType: Prefix
+        - /
+      pathType: Prefix
       tls:
         - secretName: wildcard-k8s-shimmerlabs
           hosts:
