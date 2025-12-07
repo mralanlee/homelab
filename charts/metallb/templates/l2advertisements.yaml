@@ -1,0 +1,41 @@
+{{- $defaultNamespace := .Release.Namespace -}}
+{{- range $adv := .Values.l2Advertisements }}
+{{- if $adv.name }}
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: {{ $adv.name }}
+  namespace: {{ default $defaultNamespace $adv.namespace }}
+{{- with $adv.labels }}
+  labels:
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- with $adv.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  {{- with $adv.ipAddressPools }}
+  ipAddressPools:
+  {{- range . }}
+    - {{ . }}
+  {{- end }}
+  {{- end }}
+  {{- with $adv.ipAddressPoolSelectors }}
+  ipAddressPoolSelectors:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with $adv.interfaces }}
+  interfaces:
+  {{- range . }}
+    - {{ . }}
+  {{- end }}
+  {{- end }}
+  {{- with $adv.nodeSelectors }}
+  nodeSelectors:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+---
+{{- end }}
+{{- end }}
+

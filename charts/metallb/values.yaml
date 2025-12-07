@@ -1,0 +1,19 @@
+ipAddressPools:
+  - name: homelab-services
+    addresses:
+      - 10.22.6.10-10.22.6.254
+      - 10.22.7.1-10.22.7.254
+      - 10.22.8.1-10.22.8.254
+    autoAssign: true
+
+l2Advertisements:
+  - name: homelab-services
+    ipAddressPools:
+      - homelab-services
+
+metallb:
+  controller:
+    logLevel: info
+  speaker:
+    logLevel: info
+

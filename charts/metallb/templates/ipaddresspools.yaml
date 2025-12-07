@@ -1,0 +1,35 @@
+{{- $defaultNamespace := .Release.Namespace -}}
+{{- range $pool := .Values.ipAddressPools }}
+{{- if and $pool.name $pool.addresses }}
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: {{ $pool.name }}
+  namespace: {{ default $defaultNamespace $pool.namespace }}
+{{- with $pool.labels }}
+  labels:
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- with $pool.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  addresses:
+  {{- range $pool.addresses }}
+    - {{ . }}
+  {{- end }}
+  {{- if hasKey $pool "autoAssign" }}
+  autoAssign: {{ $pool.autoAssign }}
+  {{- end }}
+  {{- if hasKey $pool "avoidBuggyIPs" }}
+  avoidBuggyIPs: {{ $pool.avoidBuggyIPs }}
+  {{- end }}
+  {{- with $pool.serviceAllocation }}
+  serviceAllocation:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+---
+{{- end }}
+{{- end }}
+
