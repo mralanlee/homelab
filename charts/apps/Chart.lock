@@ -1,0 +1,15 @@
+dependencies:
+- name: democratic-csi
+  repository: file://../democratic-csi
+  version: 0.1.0
+- name: grafana
+  repository: file://../grafana
+  version: 0.1.0
+- name: metrics-server
+  repository: file://../metrics-server
+  version: 0.1.0
+- name: prometheus
+  repository: file://../prometheus
+  version: 0.1.0
+digest: sha256:f9bd3c544e83f64732483b301edecf7adf7d0bcd5851f34bf94ea5f55e09034a
+generated: "2025-12-06T16:47:04.506377396-08:00"

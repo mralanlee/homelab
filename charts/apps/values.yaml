@@ -1,0 +1,10 @@
+apps:
+  democraticCsi:
+    enabled: true
+  grafana:
+    enabled: false
+  metricsServer:
+    enabled: false
+  prometheus:
+    enabled: false 
+
