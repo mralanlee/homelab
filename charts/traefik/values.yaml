@@ -37,5 +37,14 @@ traefik:
         default: true
   ingressRoute:
     dashboard:
-      enabled: false
-
+      enabled: true
+      entryPoints:
+        - websecure
+      routes:
+        - match: Host(`traefik.home`)
+          kind: Rule
+          services:
+            - name: traefik
+              port: 80
+          middlewares:
+            - name: traefik-dashboard-auth
