@@ -16,4 +16,14 @@ metallb:
     logLevel: info
   speaker:
     logLevel: info
+  prometheus:
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+      speaker:
+        additionalLabels:
+          release: kube-prometheus-stack
+      controller:
+        additionalLabels:
+          release: kube-prometheus-stack
 

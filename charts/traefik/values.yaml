@@ -29,12 +29,31 @@ traefik:
       externalTrafficPolicy: Cluster
       loadBalancerIP: 10.22.6.10
   ports:
+    metrics:
+      port: 9100
+      expose:
+        default: false
+      exposedPort: 9100
+      protocol: TCP
     web:
       expose:
         default: true
     websecure:
       expose:
         default: true
+  metrics:
+    prometheus:
+      enabled: true
+      entryPoint: metrics
+      service:
+        enabled: true
+        labels:
+          release: kube-prometheus-stack
+      serviceMonitor:
+        enabled: true
+        namespace: prometheus
+        additionalLabels:
+          release: kube-prometheus-stack
   ingressRoute:
     dashboard:
       enabled: true

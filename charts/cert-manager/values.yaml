@@ -10,6 +10,14 @@ cert-manager:
     - --dns01-recursive-nameservers-only=true
   webhook:
     timeoutSeconds: 10
+  prometheus:
+    enabled: true
+    servicemonitor:
+      enabled: true
+      namespace: prometheus
+      labels:
+        release: kube-prometheus-stack
+      prometheusInstance: kube-prometheus-stack
 
 clusterIssuers:
   - name: letsencrypt-staging

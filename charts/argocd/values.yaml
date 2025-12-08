@@ -14,10 +14,30 @@ argo-cd:
 
   controller:
     replicas: 1
+    metrics:
+      enabled: true
+      service:
+        labels:
+          release: kube-prometheus-stack
+      serviceMonitor:
+        enabled: true
+        namespace: prometheus
+        additionalLabels:
+          release: kube-prometheus-stack
 
   repoServer:
     autoscaling:
       enabled: false
+    metrics:
+      enabled: true
+      service:
+        labels:
+          release: kube-prometheus-stack
+      serviceMonitor:
+        enabled: true
+        namespace: prometheus
+        additionalLabels:
+          release: kube-prometheus-stack
 
   server:
     service:
@@ -34,6 +54,16 @@ argo-cd:
       https: false
     extraArgs:
       - --insecure
+    metrics:
+      enabled: true
+      service:
+        labels:
+          release: kube-prometheus-stack
+      serviceMonitor:
+        enabled: true
+        namespace: prometheus
+        additionalLabels:
+          release: kube-prometheus-stack
 
   redis:
     enabled: true

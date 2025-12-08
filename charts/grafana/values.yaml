@@ -27,6 +27,14 @@ grafana:
     hosts:
       - grafana.k8s.shimmerlabs.xyz
     tls: []
+  serviceMonitor:
+    enabled: true
+    namespace: prometheus
+    labels:
+      release: kube-prometheus-stack
+    interval: 30s
+    scrapeTimeout: 30s
+    path: /metrics
 
   resources:
     requests:
