@@ -40,11 +40,18 @@ argo-cd:
           release: kube-prometheus-stack
 
   server:
+    certificate:
+      enabled: true
+      domain: argocd.k8s.shimmerlabs.xyz
+      issuer:
+        kind: ClusterIssuer
+        name: letsencrypt-prod
     service:
       type: ClusterIP
     ingress:
       enabled: true
       ingressClassName: traefik
+      tls: true
       hostname: argocd.k8s.shimmerlabs.xyz
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
