@@ -7,3 +7,7 @@ cilium:
   operator.prometheus.serviceMonitor.enabled: true 
   prometheus.serviceMonitor.enabled: true
   prometheus.serviceMonitor.trustCRDsExist: true
+
+  nodePort:
+    enabled: true
+    enableHealthCheck: true
