@@ -11,3 +11,5 @@ cilium:
   nodePort:
     enabled: true
     enableHealthCheck: true
+
+  kubeProxyReplacement: true
