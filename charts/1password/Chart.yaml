@@ -1,0 +1,10 @@
+apiVersion: v2
+name: 1password-connect
+description: GitOps control plane for the homelab cluster
+type: application
+version: 0.1.0
+appVersion: "3.2.1"
+dependencies:
+  - name: connect 
+    version: 2.0.5
+    repository: https://1password.github.io/connect-helm-charts
