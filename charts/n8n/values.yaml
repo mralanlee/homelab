@@ -1,0 +1,43 @@
+n8n:
+  db:
+    type: postgres
+
+  worker:
+    mode: queue
+    autoscaling:
+      enabled: true
+  
+  ingress:
+    enabled: true
+    className: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: n8n.k8s.shimmerlabs.xyz
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - n8n.k8s.shimmerlabs.xyz
+        secretName: n8n-tls
+  service:
+    type: ClusterIP
+    port: 80
+
+  serviceMonitor:
+    enabled: true
+    namespace: prometheus
+    interval: 30s
+    scrapeTimeout: 30s
+    path: /metrics
+
+    include:
+      cacheMetrics: true
+      workflowIdLabel: true
+      apiEndpoints: true
+      apiPathLabel: true
+      apiStatusCodeLabel: true
+      queueMetrics: true
+      
