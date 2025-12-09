@@ -3,7 +3,7 @@ n8n:
     type: postgresdb
 
   worker:
-    mode: queue
+    mode: 
     autoscaling:
       enabled: true
   
@@ -30,8 +30,6 @@ n8n:
     enabled: true
     namespace: prometheus
     interval: 30s
-    scrapeTimeout: 30s
-    path: /metrics
 
     include:
       cacheMetrics: true
