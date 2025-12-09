@@ -3,7 +3,7 @@ n8n:
     type: postgresdb
 
   worker:
-    mode: 
+    mode: queue
     autoscaling:
       enabled: true
   
