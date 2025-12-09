@@ -40,4 +40,9 @@ n8n:
       apiPathLabel: true
       apiStatusCodeLabel: true
       queueMetrics: true
-      
+  
+  redis:
+    enabled: true
+   
+  postgresql:
+    enabled: true
