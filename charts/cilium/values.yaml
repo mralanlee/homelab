@@ -1,0 +1,9 @@
+cilium:
+  clustermesh.apiserver.metrics.serviceMonitor.enabled: true
+  envoy.prometheus.serviceMonitor.enabled: true
+  hubble.metrics.serviceMonitor.enabled: true
+  hubble.metrics.enabled: "{dns:query;ignoreAAAA,drop,tcp,flow,icmp,http}"
+  hubble.relay.prometheus.serviceMonitor.enabled: true
+  operator.prometheus.serviceMonitor.enabled: true 
+  prometheus.serviceMonitor.enabled: true
+  prometheus.serviceMonitor.trustCRDsExist: true
