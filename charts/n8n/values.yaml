@@ -1,6 +1,10 @@
 n8n:
+  timezone: America/Los_Angeles
   db:
     type: postgresdb
+
+  service:
+    port: 3000
 
   worker:
     mode: queue
