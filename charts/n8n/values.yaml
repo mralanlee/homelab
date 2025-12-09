@@ -1,6 +1,6 @@
 n8n:
   db:
-    type: postgres
+    type: postgresdb
 
   worker:
     mode: queue
