@@ -12,4 +12,4 @@ cilium:
     enabled: true
     enableHealthCheck: true
 
-  kubeProxyReplacement: true
+  kubeProxyReplacement: "true"
