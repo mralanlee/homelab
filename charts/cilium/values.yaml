@@ -18,7 +18,7 @@ cilium:
     metrics:
       serviceMonitor:
         enabled: true
-    enabled: "{dns:query;ignoreAAAA,drop,tcp,flow,icmp,http}"
+    enabled: true
     relay:
       enabled: true
       prometheus:
