@@ -1,12 +1,37 @@
 cilium:
   clustermesh.apiserver.metrics.serviceMonitor.enabled: true
-  envoy.prometheus.serviceMonitor.enabled: true
-  hubble.metrics.serviceMonitor.enabled: true
-  hubble.metrics.enabled: "{dns:query;ignoreAAAA,drop,tcp,flow,icmp,http}"
-  hubble.relay.prometheus.serviceMonitor.enabled: true
-  operator.prometheus.serviceMonitor.enabled: true 
-  prometheus.serviceMonitor.enabled: true
-  prometheus.serviceMonitor.trustCRDsExist: true
+  envoy:
+    enabled: true
+    prometheus.serviceMonitor.enabled: true
+
+  envoyConfig:
+    enabled: true
+
+  ingressController:
+    enabled: true
+    default: false
+
+  gatewayAPI:
+    enabled: true
+
+  hubble:
+    metrics:
+      serviceMonitor:
+        enabled: true
+    enabled: "{dns:query;ignoreAAAA,drop,tcp,flow,icmp,http}"
+    relay:
+      enabled: true
+      prometheus:
+        serviceMonitor.enabled: true
+    ui:
+      enabled: true
+
+  operator.prometheus.serviceMonitor.enabled: true
+
+  prometheus:
+    serviceMonitor:
+      enabled: true
+      trustCRDsExist: true
 
   nodePort:
     enabled: true
