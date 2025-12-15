@@ -38,3 +38,13 @@ cilium:
     enableHealthCheck: true
 
   kubeProxyReplacement: "true"
+ 
+hubbleIngress:
+  enabled: true
+  host: hubble.k8s.shimmerlabs.xyz
+  ingressClassName: traefik
+  entrypoints: websecure
+  clusterIssuer: letsencrypt-prod
+  tlsSecretName: hubble-ui-tls
+  namespace: kube-system
+  annotations: {}
