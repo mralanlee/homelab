@@ -41,3 +41,9 @@ authentik:
       serviceMonitor:
         enabled: true
         namespace: prometheus
+ 
+dbPassword:
+  generate: true
+  length: 32
+  includeSymbols: false
+  secretName: authentik-db-auth
