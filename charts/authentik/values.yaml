@@ -8,9 +8,8 @@ authentik:
     ingress:
       enabled: true
       ingressClassName: traefik
-      paths:
-        - /
-        - pathType: Prefix
+      hosts:
+        - authentik.k8s.shimmerlabs.xyz
       tls:
         - hosts:
             - authentik.k8s.shimmerlabs.xyz
