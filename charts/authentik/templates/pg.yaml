@@ -18,7 +18,7 @@ spec:
     roles:
       - name: authentik
         ensure: present
-        superuser: false
+        superuser: true
         login: true
         passwordSecret:
           name: {{ .Release.Name }}-db-auth
