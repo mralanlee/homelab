@@ -45,5 +45,5 @@ authentik:
 dbPassword:
   generate: true
   length: 32
-  includeSymbols: false
+  symbols: 0
   secretName: authentik-db-auth
