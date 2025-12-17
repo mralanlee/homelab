@@ -4,7 +4,7 @@ authentik:
 
     postgresql:
       host: authentik-pg-rw
-      user: authentik
+      user: file:///postgres-creds/username
       password: file:///postgres-creds/password
   server:
     ingress:
@@ -19,7 +19,7 @@ authentik:
     volumes:
       - name: postgres-creds
         secret:
-          secretName: authentik-db-auth
+          secretName: authentik-pg-app
     volumeMounts:
       - name: postgres-creds
         mountPath: /postgres-creds
@@ -34,7 +34,7 @@ authentik:
     volumes:
       - name: postgres-creds
         secret:
-          secretName: authentik-db-auth
+          secretName: authentik-pg-app
     volumeMounts:
       - name: postgres-creds
         mountPath: /postgres-creds
@@ -44,8 +44,3 @@ authentik:
         enabled: true
         namespace: prometheus
  
-dbPassword:
-  generate: true
-  length: 32
-  symbols: 0
-  secretName: authentik-db-auth
