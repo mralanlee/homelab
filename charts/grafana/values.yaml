@@ -26,7 +26,10 @@ grafana:
       cert-manager.io/cluster-issuer: letsencrypt-prod
     hosts:
       - grafana.k8s.shimmerlabs.xyz
-    tls: []
+    tls:
+      - hosts:
+          - grafana.k8s.shimmerlabs.xyz
+        secretName: grafana-tls
   serviceMonitor:
     enabled: true
     namespace: prometheus
