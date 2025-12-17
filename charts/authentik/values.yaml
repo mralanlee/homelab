@@ -1,5 +1,7 @@
 authentik:
   authentik:
+    secret_key: changeme_asdf1234
+
     postgresql:
       host: authentik-pg-rw
       user: authentik
