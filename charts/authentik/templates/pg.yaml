@@ -1,0 +1,36 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Release.Name }}-pg
+spec:
+  description: "PostgreSQL Cluster for {{ .Release.Name }}"
+  imageName: ghcr.io/cloudnative-pg/postgresql:18
+  instances: 1
+  storage:
+    size: 3Gi
+    storageClass: truenas-iscsi
+  postgresql:
+    parameters:
+      shared_buffers: 512MB
+      max_connections: "200"
+
+  managed:
+    roles:
+      - name: authentik
+        ensure: present
+        superuser: false
+        login: true
+        passwordSecret:
+          name: {{ .Release.Name }}-db-auth
+          key: password
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  name: {{ .Release.Name }}
+  owner: authentik
+  cluster:
+    name: {{ .Release.Name }}-pg

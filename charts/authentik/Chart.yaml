@@ -1,0 +1,10 @@
+apiVersion: v2
+name: authentik
+description: authentik - OIDC
+type: application
+version: 0.1.0
+appVersion: "3.2.1"
+dependencies:
+  - name: authentik
+    version: 2025.10.3
+    repository: https://charts.goauthentik.io

@@ -1,0 +1,44 @@
+authentik:
+  authentik:
+    postgresql:
+      host: authentik-pg-rw
+      user: authentik
+      password: file:///postgres-creds/password
+  server:
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      paths:
+        - /
+        - pathType: Prefix
+      tls:
+        - hosts:
+            - authentik.k8s.shimmerlabs.xyz
+          secretName: authentik-tls
+    volumes:
+      - name: postgres-creds
+        secret:
+          secretName: authentik-db-auth
+    volumeMounts:
+      - name: postgres-creds
+        mountPath: /postgres-creds
+        readOnly: true
+
+    metrics:
+      serviceMonitor:
+        enabled: true
+        namespace: prometheus
+      
+  worker:
+    volumes:
+      - name: postgres-creds
+        secret:
+          secretName: authentik-db-auth
+    volumeMounts:
+      - name: postgres-creds
+        mountPath: /postgres-creds
+        readOnly: true
+    metrics:
+      serviceMonitor:
+        enabled: true
+        namespace: prometheus
