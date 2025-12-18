@@ -31,6 +31,6 @@ metadata:
   name: {{ .Release.Name }}
 spec:
   name: {{ .Release.Name }}
-  owner: app
+  owner: authentik
   cluster:
     name: {{ .Release.Name }}-pg

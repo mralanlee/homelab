@@ -44,3 +44,7 @@ authentik:
         enabled: true
         namespace: prometheus
  
+dbPassword:
+  generate: true
+  length: 32
+  symbols: 0
