@@ -17,6 +17,8 @@ spec:
   managed:
     roles:
       - name: authentik
+        inherit: true
+        connectionLimit: -1
         ensure: present
         superuser: true
         login: true
