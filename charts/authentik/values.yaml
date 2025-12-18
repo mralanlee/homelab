@@ -9,6 +9,9 @@ authentik:
   server:
     ingress:
       enabled: true
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        cert-manager.io/cluster-issuer: letsencrypt-prod
       ingressClassName: traefik
       hosts:
         - authentik.k8s.shimmerlabs.xyz
