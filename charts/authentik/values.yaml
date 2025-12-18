@@ -19,7 +19,7 @@ authentik:
     volumes:
       - name: postgres-creds
         secret:
-          secretName: authentik-pg-app
+        secretName: authentik-db-auth
     volumeMounts:
       - name: postgres-creds
         mountPath: /postgres-creds
@@ -34,7 +34,7 @@ authentik:
     volumes:
       - name: postgres-creds
         secret:
-          secretName: authentik-pg-app
+        secretName: authentik-db-auth
     volumeMounts:
       - name: postgres-creds
         mountPath: /postgres-creds
