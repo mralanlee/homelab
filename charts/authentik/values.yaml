@@ -4,7 +4,7 @@ authentik:
 
     postgresql:
       host: authentik-pg-rw
-      user: file:///postgres-creds/username
+      user: authentik
       password: file:///postgres-creds/password
   server:
     ingress:
@@ -19,7 +19,7 @@ authentik:
     volumes:
       - name: postgres-creds
         secret:
-          secretName: authentik-pg-app
+          secretName: authentik-db-auth
     volumeMounts:
       - name: postgres-creds
         mountPath: /postgres-creds
@@ -34,7 +34,7 @@ authentik:
     volumes:
       - name: postgres-creds
         secret:
-          secretName: authentik-pg-app
+          secretName: authentik-db-auth
     volumeMounts:
       - name: postgres-creds
         mountPath: /postgres-creds
@@ -48,3 +48,4 @@ dbPassword:
   generate: true
   length: 32
   symbols: 0
+  secretName: authentik-db-auth
