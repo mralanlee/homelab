@@ -9,6 +9,20 @@ argo-cd:
   configs:
     cm:
       url: https://argocd.k8s.shimmerlabs.xyz
+      dex.config: |
+        connectors:
+        - type: oidc
+          id: authentik
+          name: authentik
+          config:
+            issuer: https://authentik.k8s.shimmerlabs.xyz/application/o/argocd/  # update slug if different
+            clientID: $dex.authentik.clientID
+            clientSecret: $dex.authentik.clientSecret
+            insecureEnableGroups: true
+            scopes:
+              - openid
+              - profile
+              - email
     params:
       server.insecure: true
 
