@@ -27,9 +27,9 @@ argo-cd:
               - email
     params:
       server.insecure: true
-      dex.server: http://argocd-dex-server:5556 
-      # Point server at dex via ingress to avoid direct service connection issues.
-      server.dex.server: http://argocd-dex-server:5556
+      # Dex serves HTTPS on 5556 (self-signed); keep TLS offload at ingress for users.
+      dex.server: https://argocd-dex-server:5556
+      server.dex.server: https://argocd-dex-server:5556
       server.dex.server.strict.tls: "false"
     rbac:
       policy.csv: |
