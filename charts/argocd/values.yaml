@@ -10,6 +10,7 @@ argo-cd:
     cm:
       url: https://argocd.k8s.shimmerlabs.xyz
       dex.config: |
+        issuer: https://argocd.k8s.shimmerlabs.xyz/api/dex
         connectors:
         - type: oidc
           id: authentik
