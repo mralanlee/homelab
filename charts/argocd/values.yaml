@@ -26,6 +26,7 @@ argo-cd:
               - email
     params:
       server.insecure: true
+      dex.server: https://argocd.k8s.shimmerlabs.xyz/api/dex
 
   controller:
     replicas: 1
