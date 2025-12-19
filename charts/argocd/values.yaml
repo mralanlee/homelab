@@ -27,8 +27,8 @@ argo-cd:
     params:
       server.insecure: true
       dex.server: https://argocd.k8s.shimmerlabs.xyz/api/dex
-      # Use in-cluster HTTP for the server<->dex communication; TLS is handled by the ingress for external clients.
-      server.dex.server: http://argocd-dex-server:5556
+      # Point server at dex via ingress to avoid direct service connection issues.
+      server.dex.server: https://argocd.k8s.shimmerlabs.xyz/api/dex
       server.dex.server.strict.tls: "false"
     rbac:
       policy.csv: |
