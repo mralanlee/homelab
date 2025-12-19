@@ -27,6 +27,12 @@ argo-cd:
     params:
       server.insecure: true
       dex.server: https://argocd.k8s.shimmerlabs.xyz/api/dex
+      server.dex.server: https://argocd.k8s.shimmerlabs.xyz/api/dex
+      server.dex.server.strict.tls: "false"
+    rbac:
+      policy.csv: |
+        g, ArgoCD Admins, role:admin
+        g, ArgoCD Viewers, role:readonly
 
   controller:
     replicas: 1
