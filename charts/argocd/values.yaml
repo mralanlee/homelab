@@ -17,7 +17,7 @@ argo-cd:
           id: authentik
           name: authentik
           config:
-            issuer: https://authentik.k8s.shimmerlabs.xyz/application/o/argocd/  # update slug if different
+            issuer: https://authentik.k8s.shimmerlabs.xyz/application/o/argo-cd/  # update slug if different
             clientID: $dex.authentik.clientID
             clientSecret: $dex.authentik.clientSecret
             insecureEnableGroups: true
