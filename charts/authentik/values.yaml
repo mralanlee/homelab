@@ -19,6 +19,8 @@ authentik:
         - hosts:
             - authentik.k8s.shimmerlabs.xyz
           secretName: authentik-tls
+    podAnnotations:
+      reloader.stakater.com/auto: "true"
     volumes:
       - name: postgres-creds
         secret:
@@ -34,6 +36,8 @@ authentik:
         namespace: prometheus
       
   worker:
+    podAnnotations:
+      reloader.stakater.com/auto: "true"
     volumes:
       - name: postgres-creds
         secret:
