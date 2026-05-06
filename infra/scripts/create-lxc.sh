@@ -18,6 +18,7 @@ IP=""
 GW="10.22.0.1"
 BRIDGE="vmbr0"
 STORAGE="local-lvm"
+USER="alan"
 SSH_KEY_FILE="$HOME/.ssh/authorized_keys"
 TEMPLATE_STORAGE="local"
 TEMPLATE_NAME="ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
@@ -38,6 +39,7 @@ Optional:
   --gw            Gateway (default: 10.22.0.1)
   --bridge        Network bridge (default: vmbr0)
   --storage       Storage target (default: local-lvm)
+  --user          Username to create (default: alan)
   --ssh-key       Path to SSH public key file (default: ~/.ssh/authorized_keys)
 EOF
   exit 1
@@ -54,6 +56,7 @@ while [[ $# -gt 0 ]]; do
     --gw)      GW="$2"; shift 2 ;;
     --bridge)  BRIDGE="$2"; shift 2 ;;
     --storage) STORAGE="$2"; shift 2 ;;
+    --user)    USER="$2"; shift 2 ;;
     --ssh-key) SSH_KEY_FILE="$2"; shift 2 ;;
     *)         echo "Unknown option: $1"; usage ;;
   esac
@@ -115,6 +118,53 @@ create_lxc() {
   echo "Starting container $CTID..."
   pct start "$CTID"
 
+  # Wait for container to be ready
+  echo "Waiting for container to boot..."
+  sleep 3
+
+  configure_lxc
+}
+
+# -------------------------------------------------------------------
+# Configure user, SSH, and security inside the container
+# -------------------------------------------------------------------
+configure_lxc() {
+  echo "Configuring user and SSH access..."
+
+  # Install sudo and openssh-server
+  pct exec "$CTID" -- bash -c "apt-get update -qq && apt-get install -y -qq sudo openssh-server > /dev/null 2>&1"
+
+  # Create user with sudo
+  pct exec "$CTID" -- bash -c "
+    useradd -m -s /bin/bash $USER 2>/dev/null || true
+    usermod -aG sudo $USER
+    echo '$USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/$USER
+    chmod 440 /etc/sudoers.d/$USER
+  "
+
+  # Set up SSH key
+  if [[ -f "$SSH_KEY_FILE" ]]; then
+    local pub_key
+    pub_key=$(cat "$SSH_KEY_FILE")
+    pct exec "$CTID" -- bash -c "
+      mkdir -p /home/$USER/.ssh
+      echo '$pub_key' > /home/$USER/.ssh/authorized_keys
+      chmod 700 /home/$USER/.ssh
+      chmod 600 /home/$USER/.ssh/authorized_keys
+      chown -R $USER:$USER /home/$USER/.ssh
+    "
+  else
+    echo "Warning: SSH key file $SSH_KEY_FILE not found. No SSH key configured."
+  fi
+
+  # Disable password auth and lock root
+  pct exec "$CTID" -- bash -c "
+    sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+    sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+    systemctl restart sshd
+    passwd -l root
+  "
+
   echo ""
   echo "================================================"
   echo " LXC Container Created Successfully"
@@ -125,6 +175,7 @@ create_lxc() {
   echo " Cores:    $CORES"
   echo " Memory:   ${MEMORY}MB"
   echo " Disk:     ${DISK}GB"
+  echo " User:     $USER"
   echo " Type:     Privileged (nesting+keyctl)"
   echo " Gateway:  $GW"
   echo "================================================"
