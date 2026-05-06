@@ -17,6 +17,7 @@ metallb:
   speaker:
     logLevel: info
   prometheus:
+    serviceAccount: metallb-prometheus
     serviceMonitor:
       enabled: true
       interval: 30
