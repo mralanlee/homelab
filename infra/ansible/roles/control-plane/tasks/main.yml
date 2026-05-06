@@ -4,11 +4,30 @@
     path: /etc/kubernetes/admin.conf
   register: kubeadm_init_check
 
+- name: Write kubeadm init config
+  ansible.builtin.copy:
+    dest: /tmp/kubeadm-init.yaml
+    mode: "0600"
+    content: |
+      apiVersion: kubeadm.k8s.io/v1beta4
+      kind: InitConfiguration
+      ---
+      apiVersion: kubeadm.k8s.io/v1beta4
+      kind: ClusterConfiguration
+      networking:
+        podSubnet: {{ pod_network_cidr }}
+        serviceSubnet: {{ service_cidr }}
+      ---
+      apiVersion: kubelet.config.k8s.io/v1beta1
+      kind: KubeletConfiguration
+      cgroupDriver: systemd
+      failSwapOn: false
+  when: not kubeadm_init_check.stat.exists
+
 - name: Initialize control plane
   ansible.builtin.command: >
     kubeadm init
-    --pod-network-cidr={{ pod_network_cidr }}
-    --service-cidr={{ service_cidr }}
+    --config=/tmp/kubeadm-init.yaml
     --skip-phases=addon/kube-proxy
     --ignore-preflight-errors=SystemVerification,Swap,FileContent--proc-sys-net-bridge-bridge-nf-call-iptables
   when: not kubeadm_init_check.stat.exists
