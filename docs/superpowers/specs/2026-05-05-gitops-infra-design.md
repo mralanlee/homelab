@@ -81,7 +81,7 @@ Two scripts: `create-lxc.sh` for the control plane LXC container, `create-vm.sh`
 ```bash
 # Minimal — just name and IP
 curl -sL https://raw.githubusercontent.com/mralanlee/homelab/main/infra/scripts/create-lxc.sh \
-  | bash -s -- --name k8s-cp-1 --ip 10.22.6.100/24
+  | bash -s -- --name k8s-cp-1 --ip 10.22.6.100/16
 ```
 
 | Param | Required | Default |
@@ -112,11 +112,11 @@ Script flow:
 ```bash
 # Minimal — just name and IP
 curl -sL https://raw.githubusercontent.com/mralanlee/homelab/main/infra/scripts/create-vm.sh \
-  | bash -s -- --name k8s-w-1 --ip 10.22.6.101/24
+  | bash -s -- --name k8s-w-1 --ip 10.22.6.101/16
 
 # With overrides
 curl -sL https://raw.githubusercontent.com/mralanlee/homelab/main/infra/scripts/create-vm.sh \
-  | bash -s -- --name k8s-w-3 --ip 10.22.6.103/24 --cores 4 --memory 8192 --disk 64
+  | bash -s -- --name k8s-w-3 --ip 10.22.6.103/16 --cores 4 --memory 8192 --disk 64
 ```
 
 | Param | Required | Default |

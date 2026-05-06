@@ -6,7 +6,7 @@ set -euo pipefail
 #
 # Usage:
 #   curl -sL https://raw.githubusercontent.com/mralanlee/homelab/main/infra/scripts/create-vm.sh \
-#     | bash -s -- --name k8s-w-1 --ip 10.22.6.101/24
+#     | bash -s -- --name k8s-w-1 --ip 10.22.6.101/16
 # -------------------------------------------------------------------
 
 VMID=""
@@ -30,7 +30,7 @@ Usage: $0 --name <hostname> --ip <cidr> [options]
 
 Required:
   --name          VM hostname (e.g. k8s-w-1)
-  --ip            Static IP in CIDR notation (e.g. 10.22.6.101/24)
+  --ip            Static IP in CIDR notation (e.g. 10.22.6.101/16)
 
 Optional:
   --vmid          VM ID (default: auto via pvesh get /cluster/nextid)

@@ -11,3 +11,6 @@ infra/ansible/.join-token
 
 # Brainstorm artifacts
 .superpowers/
+
+# Secrets
+driver.yaml

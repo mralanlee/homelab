@@ -6,7 +6,7 @@ set -euo pipefail
 #
 # Usage:
 #   curl -sL https://raw.githubusercontent.com/mralanlee/homelab/main/infra/scripts/create-lxc.sh \
-#     | bash -s -- --name k8s-cp-1 --ip 10.22.6.100/24
+#     | bash -s -- --name k8s-cp-1 --ip 10.22.6.100/16
 # -------------------------------------------------------------------
 
 CTID=""
@@ -28,7 +28,7 @@ Usage: $0 --name <hostname> --ip <cidr> [options]
 
 Required:
   --name          Container hostname (e.g. k8s-cp-1)
-  --ip            Static IP in CIDR notation (e.g. 10.22.6.100/24)
+  --ip            Static IP in CIDR notation (e.g. 10.22.6.100/16)
 
 Optional:
   --ctid          Container ID (default: auto via pvesh get /cluster/nextid)

@@ -19,11 +19,11 @@ direnv allow   # loads ansible, argocd, cilium-cli
 ```bash
 # Control plane LXC (on singed)
 curl -sL https://raw.githubusercontent.com/mralanlee/homelab/main/infra/scripts/create-lxc.sh \
-  | bash -s -- --name k8s-cp-1 --ip 10.22.6.100/24
+  | bash -s -- --name k8s-cp-1 --ip 10.22.6.100/16
 
 # Worker VMs (on respective hosts)
 curl -sL https://raw.githubusercontent.com/mralanlee/homelab/main/infra/scripts/create-vm.sh \
-  | bash -s -- --name k8s-w-1 --ip 10.22.6.101/24
+  | bash -s -- --name k8s-w-1 --ip 10.22.6.101/16
 
 # Repeat for k8s-w-2, k8s-w-3, k8s-w-4 on desired hosts
 ```
@@ -69,7 +69,7 @@ helm dependency update charts/argocd-apps && helm install argocd-apps charts/arg
 ```bash
 # Add a new worker
 # 1. Create VM on a Proxmox host
-curl -sL .../create-vm.sh | bash -s -- --name k8s-w-5 --ip 10.22.6.105/24
+curl -sL .../create-vm.sh | bash -s -- --name k8s-w-5 --ip 10.22.6.105/16
 # 2. Add to infra/ansible/inventory/hosts.yml
 # 3. Run bootstrap
 cd infra/ansible && ansible-playbook playbooks/bootstrap-worker.yml --limit k8s-w-5
