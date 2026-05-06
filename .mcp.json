@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "proxmox-mcp-plus": {
+      "command": "uvx",
+      "args": [
+        "proxmox-mcp-plus"
+      ],
+      "env": {
+        "PROXMOX_MCP_CONFIG": "/Users/alan/.config/proxmox-config/config.json"
+      }
+    }
+  }
+}

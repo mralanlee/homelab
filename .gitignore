@@ -1,6 +1,7 @@
 charts/**/charts/*.tgz
 proxmox_mcp.log
 proxmox-jobs*
+driver.yaml
 
 # Nix
 .direnv/
