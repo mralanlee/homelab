@@ -163,6 +163,14 @@ configure_lxc() {
     sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
     systemctl restart sshd
     passwd -l root
+    passwd -l $USER
+  "
+
+  # Mask console getty services (no console login prompt)
+  pct exec "$CTID" -- bash -c "
+    systemctl mask console-getty.service
+    systemctl mask container-getty@1.service
+    systemctl mask getty@tty1.service
   "
 
   echo ""
