@@ -10,6 +10,7 @@
     --pod-network-cidr={{ pod_network_cidr }}
     --service-cidr={{ service_cidr }}
     --skip-phases=addon/kube-proxy
+    --ignore-preflight-errors=SystemVerification,Swap,FileContent--proc-sys-net-bridge-bridge-nf-call-iptables
   when: not kubeadm_init_check.stat.exists
   register: kubeadm_init
 
