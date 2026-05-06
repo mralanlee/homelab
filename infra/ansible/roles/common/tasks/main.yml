@@ -1,19 +1,27 @@
 ---
-- name: Disable swap
+- name: Detect virtualization type
+  ansible.builtin.setup:
+    filter: ansible_virtualization_type
+
+- name: Disable swap (skip in LXC)
   ansible.builtin.command: swapoff -a
   changed_when: true
+  failed_when: false
+  when: ansible_virtualization_type != "lxc"
 
-- name: Remove swap from fstab
+- name: Remove swap from fstab (skip in LXC)
   ansible.builtin.lineinfile:
     path: /etc/fstab
     regexp: '\sswap\s'
     state: absent
+  when: ansible_virtualization_type != "lxc"
 
-- name: Load required kernel modules
+- name: Load required kernel modules (skip in LXC, kernel shared with host)
   ansible.builtin.modprobe:
     name: "{{ item }}"
     state: present
   loop: "{{ kernel_modules }}"
+  when: ansible_virtualization_type != "lxc"
 
 - name: Persist kernel modules
   ansible.builtin.copy:
@@ -24,13 +32,14 @@
       {% endfor %}
     mode: "0644"
 
-- name: Set sysctl params
+- name: Set sysctl params (skip in LXC, kernel params controlled by host)
   ansible.posix.sysctl:
     name: "{{ item.key }}"
     value: "{{ item.value }}"
     sysctl_file: /etc/sysctl.d/99-kubernetes.conf
     reload: true
   loop: "{{ sysctl_params | dict2items }}"
+  when: ansible_virtualization_type != "lxc"
 
 - name: Install required packages
   ansible.builtin.apt:
