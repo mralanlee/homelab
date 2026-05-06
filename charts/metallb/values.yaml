@@ -13,6 +13,8 @@ l2Advertisements:
 
 metallb:
   controller:
+    # Webhook disabled — API server in LXC can't reach pod network ClusterIPs reliably
+    webhookMode: disabled
     logLevel: info
   speaker:
     logLevel: info
