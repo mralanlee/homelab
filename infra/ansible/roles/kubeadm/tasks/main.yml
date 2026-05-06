@@ -1,0 +1,35 @@
+---
+- name: Add Kubernetes GPG key
+  ansible.builtin.apt_key:
+    url: "https://pkgs.k8s.io/core:/stable:/v{{ kube_version }}/deb/Release.key"
+    state: present
+
+- name: Add Kubernetes repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://pkgs.k8s.io/core:/stable:/v{{ kube_version }}/deb/ /"
+    state: present
+    filename: kubernetes
+
+- name: Install kubeadm, kubelet, kubectl
+  ansible.builtin.apt:
+    name:
+      - "kubeadm={{ kube_package_version }}"
+      - "kubelet={{ kube_package_version }}"
+      - "kubectl={{ kube_package_version }}"
+    state: present
+    update_cache: true
+
+- name: Hold kubeadm, kubelet, kubectl at current version
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - kubeadm
+    - kubelet
+    - kubectl
+
+- name: Enable and start kubelet
+  ansible.builtin.systemd:
+    name: kubelet
+    state: started
+    enabled: true
