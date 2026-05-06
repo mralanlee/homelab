@@ -1,0 +1,52 @@
+# GitHub repository URL
+repoURL: https://github.com/mralanlee/homelab.git
+targetRevision: main
+
+apps:
+  - name: cilium
+    namespace: kube-system
+    path: charts/cilium
+
+  - name: metallb
+    namespace: metallb-system
+    path: charts/metallb
+
+  - name: traefik
+    namespace: traefik
+    path: charts/traefik
+
+  - name: cert-manager
+    namespace: cert-manager
+    path: charts/cert-manager
+
+  - name: external-secrets
+    namespace: external-secrets
+    path: charts/external-secrets
+
+  - name: cn-pg
+    namespace: cnpg-system
+    path: charts/cn-pg
+
+  - name: democratic-csi
+    namespace: democratic-csi
+    path: charts/democratic-csi
+
+  - name: authentik
+    namespace: authentik
+    path: charts/authentik
+
+  - name: grafana
+    namespace: grafana
+    path: charts/grafana
+
+  - name: kube-prometheus-stack
+    namespace: monitoring
+    path: charts/kube-prometheus-stack
+
+  - name: metrics-server
+    namespace: kube-system
+    path: charts/metrics-server
+
+  - name: n8n
+    namespace: n8n
+    path: charts/n8n
