@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "mcp__proxmox-mcp-plus__get_vms",
+      "mcp__proxmox-mcp-plus__get_node_status",
+      "mcp__proxmox-mcp-plus__get_containers"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "proxmox-mcp-plus"
+  ]
+}
