@@ -1,0 +1,3 @@
+---
+# Control plane specific vars
+kubeadm_role: control-plane

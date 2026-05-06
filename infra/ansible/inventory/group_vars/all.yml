@@ -1,0 +1,29 @@
+---
+# Kubernetes version — pin to specific version for reproducibility
+kube_version: "1.33"
+kube_package_version: "1.33.*"
+
+# Pod network CIDR — Cilium default
+pod_network_cidr: "10.244.0.0/16"
+
+# Service CIDR
+service_cidr: "10.96.0.0/12"
+
+# Containerd version
+containerd_version: "1.7.*"
+
+# DNS
+dns_servers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+# Kernel modules required for Kubernetes
+kernel_modules:
+  - overlay
+  - br_netfilter
+
+# Sysctl params required for Kubernetes
+sysctl_params:
+  net.bridge.bridge-nf-call-iptables: 1
+  net.bridge.bridge-nf-call-ip6tables: 1
+  net.ipv4.ip_forward: 1
