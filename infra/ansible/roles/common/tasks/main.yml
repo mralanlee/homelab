@@ -115,3 +115,12 @@
       exit 0
     mode: "0755"
   when: not dev_kmsg.stat.exists
+
+- name: Mask console getty services (no console login prompt)
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    masked: true
+  loop:
+    - console-getty.service
+    - getty@tty1.service
+  failed_when: false
