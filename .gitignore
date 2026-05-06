@@ -1,3 +1,13 @@
 charts/**/charts/*.tgz
 proxmox_mcp.log
 proxmox-jobs*
+
+# Nix
+.direnv/
+result
+
+# Ansible
+infra/ansible/.join-token
+
+# Brainstorm artifacts
+.superpowers/
