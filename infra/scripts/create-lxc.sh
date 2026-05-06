@@ -115,6 +115,15 @@ create_lxc() {
     --start false \
     $ssh_args
 
+  # Apply LXC config tweaks for kubeadm compatibility
+  echo "Applying LXC config for kubeadm compatibility..."
+  cat >> "/etc/pve/lxc/${CTID}.conf" <<EOF
+lxc.apparmor.profile: unconfined
+lxc.cgroup2.devices.allow: a
+lxc.cap.drop:
+lxc.mount.auto: proc:rw sys:rw
+EOF
+
   echo "Starting container $CTID..."
   pct start "$CTID"
 

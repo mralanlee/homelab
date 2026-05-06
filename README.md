@@ -17,6 +17,9 @@ direnv allow   # loads ansible, argocd, cilium-cli
 ### 1. Create Nodes (on Proxmox hosts)
 
 ```bash
+# Prep the Proxmox host that will run the control plane LXC (sysctl + kernel modules)
+curl -sL https://raw.githubusercontent.com/mralanlee/homelab/main/infra/scripts/prep-proxmox-host.sh | bash
+
 # Control plane LXC (on singed)
 curl -sL https://raw.githubusercontent.com/mralanlee/homelab/main/infra/scripts/create-lxc.sh \
   | bash -s -- --name k8s-cp-1 --ip 10.22.6.100/16
