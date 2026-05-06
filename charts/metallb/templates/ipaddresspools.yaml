@@ -6,12 +6,15 @@ kind: IPAddressPool
 metadata:
   name: {{ $pool.name }}
   namespace: {{ default $defaultNamespace $pool.namespace }}
-{{- with $pool.labels }}
-  labels:
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+{{- with $pool.annotations }}
 {{ toYaml . | indent 4 }}
 {{- end }}
-{{- with $pool.annotations }}
-  annotations:
+{{- with $pool.labels }}
+  labels:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:

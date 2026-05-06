@@ -20,7 +20,9 @@ metallb:
     serviceAccount: metallb-prometheus
     namespace: metallb-system
     serviceMonitor:
-      enabled: true
+      # Disabled until kube-prometheus-stack is installed (provides ServiceMonitor CRD).
+      # Re-enable via ArgoCD after monitoring stack syncs.
+      enabled: false
       interval: 30
       speaker:
         additionalLabels:
