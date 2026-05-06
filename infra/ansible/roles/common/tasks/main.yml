@@ -124,3 +124,25 @@
     - console-getty.service
     - getty@tty1.service
   failed_when: false
+
+# LXC: kubelet must not fail on swap (host swap visible in container)
+- name: Create kubelet systemd drop-in dir
+  ansible.builtin.file:
+    path: /etc/systemd/system/kubelet.service.d
+    state: directory
+    mode: "0755"
+  when: ansible_virtualization_type == "lxc"
+
+- name: Configure kubelet to ignore swap in LXC
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/kubelet.service.d/20-fail-swap-off.conf
+    content: |
+      [Service]
+      Environment="KUBELET_EXTRA_ARGS=--fail-swap-on=false"
+    mode: "0644"
+  when: ansible_virtualization_type == "lxc"
+
+- name: Reload systemd after kubelet drop-in
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: ansible_virtualization_type == "lxc"
