@@ -19,7 +19,7 @@ metallb:
   prometheus:
     serviceMonitor:
       enabled: true
-      interval: 30s
+      interval: 30
       speaker:
         additionalLabels:
           release: kube-prometheus-stack
