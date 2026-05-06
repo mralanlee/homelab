@@ -1,0 +1,5 @@
+apiVersion: v2
+name: argocd-apps
+description: App-of-apps pattern — generates ArgoCD Application CRs for all charts
+type: application
+version: 0.1.0
