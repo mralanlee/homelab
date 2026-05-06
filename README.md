@@ -47,15 +47,37 @@ ansible-playbook playbooks/bootstrap-worker.yml
 
 ### 3. Bootstrap ArgoCD
 
-```bash
-# Install CNI, load balancer, and ArgoCD (one-time)
-helm dependency update charts/cilium && helm install cilium charts/cilium -n kube-system
-helm dependency update charts/metallb && helm install metallb charts/metallb -n metallb-system --create-namespace
-helm dependency update charts/argocd && helm install argocd charts/argocd -n argocd --create-namespace
+Order matters — each step depends on the previous being healthy.
 
-# Deploy app-of-apps — ArgoCD manages everything from here
-helm dependency update charts/argocd-apps && helm install argocd-apps charts/argocd-apps -n argocd
+```bash
+# Step 1: Install Cilium (CNI). Without this no pods schedule.
+helm dependency update charts/cilium
+helm install cilium charts/cilium -n kube-system
+
+# Wait until Cilium pods are running and nodes are Ready
+kubectl wait --for=condition=Ready node --all --timeout=300s
+kubectl -n kube-system wait --for=condition=Ready pod -l k8s-app=cilium --timeout=300s
+
+# Step 2: Install MetalLB (LoadBalancer IPs). Webhook needs networking from step 1.
+helm dependency update charts/metallb
+helm install metallb charts/metallb -n metallb-system --create-namespace
+
+# Wait until MetalLB controller is ready
+kubectl -n metallb-system wait --for=condition=Available deployment/metallb-controller --timeout=300s
+
+# Step 3: Install ArgoCD
+helm dependency update charts/argocd
+helm install argocd charts/argocd -n argocd --create-namespace
+
+# Wait until ArgoCD server is ready
+kubectl -n argocd wait --for=condition=Available deployment/argocd-server --timeout=300s
+
+# Step 4: Deploy app-of-apps — ArgoCD manages everything else from here
+helm dependency update charts/argocd-apps
+helm install argocd-apps charts/argocd-apps -n argocd
 ```
+
+**Note:** MetalLB ServiceMonitor is disabled by default since it requires `kube-prometheus-stack` CRDs. Re-enable in `charts/metallb/values.yaml` after `kube-prometheus-stack` syncs via ArgoCD.
 
 ## Node Topology
 
