@@ -1,0 +1,8 @@
+gateway:
+  name: homelab
+  namespace: gateway
+  className: cilium
+  hostname: "*.k8s.shimmerlabs.xyz"
+  tlsSecretName: homelab-wildcard-tls
+  clusterIssuer: letsencrypt-prod
+  loadBalancerIP: 10.22.6.10

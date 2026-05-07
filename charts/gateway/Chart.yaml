@@ -1,0 +1,5 @@
+apiVersion: v2
+name: gateway
+description: Homelab Gateway (Cilium Gateway API + cert-manager TLS)
+type: application
+version: 0.1.0

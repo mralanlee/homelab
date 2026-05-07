@@ -76,14 +76,11 @@ argo-cd:
     service:
       type: ClusterIP
     ingress:
-      enabled: true
+      # Disabled — using Cilium Gateway API HTTPRoute instead (see templates/httproute.yaml)
+      enabled: false
       ingressClassName: traefik
       tls: true
       hostname: argocd.k8s.shimmerlabs.xyz
-      annotations:
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-      paths:
-        - /
     extraArgs:
       - --insecure
     metrics:
