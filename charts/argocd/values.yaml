@@ -44,8 +44,9 @@ argo-cd:
         labels:
           release: kube-prometheus-stack
       serviceMonitor:
-        enabled: true
-        namespace: prometheus
+        # Disabled until kube-prometheus-stack provides ServiceMonitor CRD + monitoring ns.
+        enabled: false
+        namespace: monitoring
         additionalLabels:
           release: kube-prometheus-stack
 
@@ -58,8 +59,9 @@ argo-cd:
         labels:
           release: kube-prometheus-stack
       serviceMonitor:
-        enabled: true
-        namespace: prometheus
+        # Disabled until kube-prometheus-stack provides ServiceMonitor CRD + monitoring ns.
+        enabled: false
+        namespace: monitoring
         additionalLabels:
           release: kube-prometheus-stack
 
@@ -89,8 +91,9 @@ argo-cd:
         labels:
           release: kube-prometheus-stack
       serviceMonitor:
-        enabled: true
-        namespace: prometheus
+        # Disabled until kube-prometheus-stack provides ServiceMonitor CRD + monitoring ns.
+        enabled: false
+        namespace: monitoring
         additionalLabels:
           release: kube-prometheus-stack
 
