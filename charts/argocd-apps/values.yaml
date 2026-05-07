@@ -56,8 +56,3 @@ apps:
     namespace: authentik
     path: charts/authentik
     syncWave: 10
-
-  - name: n8n
-    namespace: n8n
-    path: charts/n8n
-    syncWave: 10
