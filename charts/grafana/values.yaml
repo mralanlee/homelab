@@ -31,7 +31,9 @@ grafana:
           - grafana.k8s.shimmerlabs.xyz
         secretName: grafana-tls
   serviceMonitor:
-    enabled: true
+    # Disabled until kube-prometheus-stack provides ServiceMonitor CRD.
+    # Re-enable after monitoring stack syncs.
+    enabled: false
     namespace: prometheus
     labels:
       release: kube-prometheus-stack
