@@ -49,8 +49,17 @@
       - curl
       - gnupg
       - software-properties-common
+      - open-iscsi
+      - nfs-common
     state: present
     update_cache: true
+
+- name: Enable and start iscsid
+  ansible.builtin.systemd:
+    name: iscsid
+    state: started
+    enabled: true
+  when: ansible_virtualization_type != "lxc"
 
 - name: Add Docker GPG key (for containerd)
   ansible.builtin.apt_key:
