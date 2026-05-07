@@ -2,7 +2,23 @@
 repoURL: https://github.com/mralanlee/homelab.git
 targetRevision: main
 
+# Sync waves order:
+# -10: foundational CRDs (kube-prometheus-stack provides ServiceMonitor)
+#   0: default (most apps)
+#  10: app-layer that depends on foundational stuff being healthy
 apps:
+  # Wave -10: install first — provides ServiceMonitor CRD that other charts use
+  - name: kube-prometheus-stack
+    namespace: monitoring
+    path: charts/kube-prometheus-stack
+    syncWave: -10
+
+  - name: cn-pg
+    namespace: cnpg-system
+    path: charts/cn-pg
+    syncWave: -10
+
+  # Wave 0: core infrastructure
   - name: cilium
     namespace: kube-system
     path: charts/cilium
@@ -23,30 +39,25 @@ apps:
     namespace: external-secrets
     path: charts/external-secrets
 
-  - name: cn-pg
-    namespace: cnpg-system
-    path: charts/cn-pg
-
   - name: democratic-csi
     namespace: democratic-csi
     path: charts/democratic-csi
-
-  - name: authentik
-    namespace: authentik
-    path: charts/authentik
-
-  - name: grafana
-    namespace: grafana
-    path: charts/grafana
-
-  - name: kube-prometheus-stack
-    namespace: monitoring
-    path: charts/kube-prometheus-stack
 
   - name: metrics-server
     namespace: kube-system
     path: charts/metrics-server
 
+  - name: grafana
+    namespace: grafana
+    path: charts/grafana
+
+  # Wave 10: depends on cn-pg + cert-manager + external-secrets
+  - name: authentik
+    namespace: authentik
+    path: charts/authentik
+    syncWave: 10
+
   - name: n8n
     namespace: n8n
     path: charts/n8n
+    syncWave: 10
