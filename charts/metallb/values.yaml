@@ -16,6 +16,10 @@ metallb:
     # Webhook disabled — API server in LXC can't reach pod network ClusterIPs reliably
     webhookMode: disabled
     logLevel: info
+  crds:
+    enabled: true
+    # Don't fail on webhook errors (LXC API server can't reach webhook reliably)
+    validationFailurePolicy: Ignore
   speaker:
     logLevel: info
   prometheus:
