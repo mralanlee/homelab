@@ -7,9 +7,7 @@ metadata:
   name: {{ $adv.name }}
   namespace: {{ default $defaultNamespace $adv.namespace }}
   annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-weight": "10"
-    "helm.sh/hook-delete-policy": before-hook-creation
+    argocd.argoproj.io/sync-wave: "10"
 {{- with $adv.annotations }}
 {{ toYaml . | indent 4 }}
 {{- end }}
