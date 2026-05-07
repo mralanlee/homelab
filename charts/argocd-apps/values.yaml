@@ -63,3 +63,12 @@ apps:
     namespace: authentik
     path: charts/authentik
     syncWave: 10
+    # cn-pg operator mutates Cluster CR fields. Ignore those to avoid drift.
+    ignoreDifferences:
+      - group: postgresql.cnpg.io
+        kind: Cluster
+        jsonPointers:
+          - /spec/bootstrap
+          - /spec/storage
+        managedFieldsManagers:
+          - cnpg-controller-manager

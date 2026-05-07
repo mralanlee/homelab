@@ -33,4 +33,8 @@ spec:
       {{- if .replaceLargeCRDs }}
       - Replace=true
       {{- end }}
+  {{- with .ignoreDifferences }}
+  ignoreDifferences:
+{{ toYaml . | indent 4 }}
+  {{- end }}
 {{- end }}
