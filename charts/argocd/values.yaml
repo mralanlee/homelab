@@ -25,6 +25,7 @@ argo-cd:
               - openid
               - profile
               - email
+              - groups
     params:
       server.insecure: true
       # Dex serves HTTPS on 5556 (self-signed); keep TLS offload at ingress for users.
