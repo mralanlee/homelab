@@ -12,9 +12,10 @@ apps:
     namespace: monitoring
     path: charts/kube-prometheus-stack
     syncWave: -10
-    # CRD annotations from kube-prometheus-stack exceed K8s 262144 byte annotation limit.
-    # ServerSideApply=true bypasses this by using server-side apply.
+    # CRDs from kube-prometheus-stack exceed K8s 262144 byte annotation limit.
+    # ServerSideApply + Replace bypasses last-applied-configuration annotation issue.
     serverSideApply: true
+    replaceLargeCRDs: true
 
   - name: cn-pg
     namespace: cnpg-system

@@ -30,4 +30,7 @@ spec:
       {{- if .serverSideApply }}
       - ServerSideApply=true
       {{- end }}
+      {{- if .replaceLargeCRDs }}
+      - Replace=true
+      {{- end }}
 {{- end }}
