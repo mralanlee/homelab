@@ -5,10 +5,17 @@ external-secrets:
   metrics.service.enabled: true
 
   serviceMonitor:
-    enabled: true
+    enabled: false
     namespace: prometheus
     interval: 30s
     scrapeTimeout: 10s
+
+  # Force ndots:1 to bypass search domain resolution issues
+  # (my.1password.com.xyz resolves via public DNS due to 'xyz' search match)
+  dnsConfig:
+    options:
+      - name: ndots
+        value: "1"
 
 reloader:
   logFormat: json
