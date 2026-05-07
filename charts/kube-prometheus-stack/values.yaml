@@ -1,4 +1,7 @@
 kube-prometheus-stack:
+  # CRDs installed via separate prometheus-operator-crds chart (avoids ArgoCD annotation size limit)
+  crds:
+    enabled: false
   grafana:
     enabled: false
 

@@ -7,15 +7,18 @@ targetRevision: main
 #   0: default (most apps)
 #  10: app-layer that depends on foundational stuff being healthy
 apps:
+  # Wave -20: prometheus-operator CRDs (must exist before kube-prometheus-stack and any chart using ServiceMonitor)
+  - name: prometheus-operator-crds
+    namespace: monitoring
+    path: charts/prometheus-operator-crds
+    syncWave: -20
+    serverSideApply: true
+
   # Wave -10: install first — provides ServiceMonitor CRD that other charts use
   - name: kube-prometheus-stack
     namespace: monitoring
     path: charts/kube-prometheus-stack
     syncWave: -10
-    # CRDs from kube-prometheus-stack exceed K8s 262144 byte annotation limit.
-    # ServerSideApply + Replace bypasses last-applied-configuration annotation issue.
-    serverSideApply: true
-    replaceLargeCRDs: true
 
   - name: cn-pg
     namespace: cnpg-system
