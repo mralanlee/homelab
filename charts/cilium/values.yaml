@@ -11,7 +11,8 @@ cilium:
     enabled: true
 
   ingressController:
-    enabled: true
+    # Disabled — Traefik handles ingress. Cilium ingress would compete for LoadBalancer IPs.
+    enabled: false
     default: false
 
   gatewayAPI:
