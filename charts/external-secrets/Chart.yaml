@@ -6,7 +6,7 @@ version: 0.1.0
 appVersion: "3.2.1"
 dependencies:
   - name: external-secrets
-    version: 2.4.1
+    version: 1.1.1
     repository: https://charts.external-secrets.io
   - name: reloader
     version: 2.2.11

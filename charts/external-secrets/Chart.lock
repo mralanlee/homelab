@@ -1,9 +1,9 @@
 dependencies:
 - name: external-secrets
   repository: https://charts.external-secrets.io
-  version: 2.4.1
+  version: 1.1.1
 - name: reloader
   repository: https://stakater.github.io/stakater-charts
   version: 2.2.11
-digest: sha256:e2f7a83c01947d86f55ec10cc4cd325dc18dae6bbf4e8fdbfdcdfcbe5e761ff9
-generated: "2026-05-06T10:29:26.760046-07:00"
+digest: sha256:18d0a3d2aca56c283e213a35de890aa72086eb0911c06090a94e0ccde2cb9b1a
+generated: "2026-05-06T17:26:22.823251-07:00"
