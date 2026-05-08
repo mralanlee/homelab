@@ -7,7 +7,7 @@ metadata:
     io.cilium/lb-ipam-ips: {{ .Values.bind9.loadBalancerIP | quote }}
 spec:
   type: LoadBalancer
-  externalTrafficPolicy: Local
+  externalTrafficPolicy: Cluster
   selector:
     app: bind9
   ports:
