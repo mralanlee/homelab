@@ -8,6 +8,13 @@
       "env": {
         "PROXMOX_MCP_CONFIG": "/Users/alan/.config/proxmox-config/config.json"
       }
+    },
+    "kubernetes": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-kubernetes"
+      ]
     }
   }
 }

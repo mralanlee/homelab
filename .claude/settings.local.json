@@ -8,6 +8,8 @@
     ]
   },
   "enabledMcpjsonServers": [
-    "proxmox-mcp-plus"
-  ]
+    "proxmox-mcp-plus",
+    "kubernetes"
+  ],
+  "enableAllProjectMcpServers": true
 }
