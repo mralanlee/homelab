@@ -100,10 +100,4 @@ argo-cd:
 
   dex:
     enabled: true
-    # Map external authentik URL to internal cluster service so OIDC discovery
-    # bypasses Cilium hairpin/LoadBalancer. Issuer URL stays external (for JWT iss claim).
-    hostAliases:
-      - ip: 10.111.249.141
-        hostnames:
-          - authentik.k8s.shimmerlabs.xyz
 
