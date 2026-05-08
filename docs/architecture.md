@@ -43,8 +43,9 @@ graph TB
     CFDNS -->|10.22.6.10| OPN
     OPN -->|LAN routing| K8s
 
-    UNB -->|forward k8s.shimmerlabs.xyz| K8sGateway[k8s-gateway<br/>10.22.6.53]
-    K8sGateway -.->|reads HTTPRoute/Gateway| K8s
+    UNB -->|forward k8s.shimmerlabs.xyz| BIND[bind9<br/>10.22.6.53<br/>authoritative]
+    EDNS[external-dns<br/>RFC2136 / TSIG] -.->|writes records| BIND
+    EDNS -.->|watches| K8s
 
     singed -->|hosts| CP
     singed -->|hosts| W1
@@ -83,12 +84,15 @@ graph TB
     subgraph DNS
         CFDNS[Cloudflare<br/>*.k8s.shimmerlabs.xyz<br/>→ 10.22.6.10]
         Unbound[OPNsense Unbound<br/>forward k8s.shimmerlabs.xyz]
-        K8sGateway[k8s-gateway<br/>10.22.6.53]
+        BIND[bind9<br/>10.22.6.53<br/>authoritative]
+        EDNS[external-dns<br/>RFC2136 / TSIG]
     end
 
     Client -->|public DNS| CFDNS
     Client -->|home network| Unbound
-    Unbound -->|forward zone| K8sGateway
+    Unbound -->|forward zone| BIND
+    EDNS -->|writes records via TSIG| BIND
+    EDNS -.->|watches HTTPRoute / Gateway / Service| Cluster
 
     subgraph Cluster
         Gateway[Cilium Gateway<br/>10.22.6.10<br/>port 443 TLS]
@@ -202,7 +206,7 @@ graph TB
     W30["Wave -30<br/>Gateway API CRDs<br/>experimental channel"]
     W20["Wave -20<br/>prometheus-operator-crds"]
     W10["Wave -10<br/>kube-prometheus-stack<br/>cn-pg"]
-    W0["Wave 0<br/>Cilium, gateway, k8s-gateway,<br/>cert-manager, external-secrets,<br/>democratic-csi, metrics-server, grafana"]
+    W0["Wave 0<br/>Cilium, gateway, bind9, external-dns,<br/>cert-manager, external-secrets,<br/>democratic-csi, metrics-server, grafana"]
     W10p["Wave +10<br/>authentik (depends on cn-pg)"]
 
     W30 --> W20 --> W10 --> W0 --> W10p
@@ -234,7 +238,8 @@ homelab/
     ├── gateway/                       # Cilium Gateway resource + cert
     ├── gateway-api-crds/              # experimental channel CRDs
     ├── grafana/
-    ├── k8s-gateway/                   # internal DNS
+    ├── bind9/                         # authoritative DNS for k8s.shimmerlabs.xyz
+    ├── external-dns/                  # writes records to bind9 via RFC2136 TSIG
     ├── kube-prometheus-stack/         # Prom + Alertmanager
     ├── metrics-server/
     └── prometheus-operator-crds/      # out-of-band CRDs
@@ -277,7 +282,7 @@ graph TB
 | Cilium Gateway API (not Ingress) | Modern K8s standard, drops Traefik dependency |
 | Cilium L2 (not MetalLB) | Single tool, no EndpointSlice label hack |
 | Gateway API experimental CRDs | Cilium needs v1alpha2 served (TLSRoute) |
-| k8s-gateway for internal DNS | No external-dns + TSIG infra needed |
+| bind9 + external-dns (RFC2136 TSIG) | Same tool family for internal + future public DNS; standard pattern |
 | 1Password ESO + service account token | Secrets stay in 1Password, K8s pulls on-demand |
 | ServerSideApply for kube-prometheus-stack | CRDs exceed 262144 byte annotation limit |
 | Out-of-band prometheus-operator-crds | Same annotation limit problem; install separately |
