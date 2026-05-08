@@ -1,0 +1,17 @@
+bind9:
+  image:
+    repository: internetsystemsconsortium/bind9
+    tag: "9.20"
+  zone: k8s.shimmerlabs.xyz
+  loadBalancerIP: 10.22.6.53
+  primaryNS: ns1.k8s.shimmerlabs.xyz
+  hostmaster: hostmaster.k8s.shimmerlabs.xyz
+  # TSIG key name (must match what external-dns is configured with)
+  tsigKeyName: externaldns-key
+  # 1Password reference for TSIG secret value
+  tsigSecretOpRef:
+    item: bind9-externaldns-tsig
+    field: secret
+  forwarders:
+    - 8.8.8.8
+    - 8.8.4.4

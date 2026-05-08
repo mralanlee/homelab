@@ -1,0 +1,111 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bind9
+  labels:
+    app: bind9
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: bind9
+  template:
+    metadata:
+      labels:
+        app: bind9
+      annotations:
+        reloader.stakater.com/auto: "true"
+    spec:
+      initContainers:
+        - name: init-zone
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              # Build TSIG key file from secret
+              cat > /etc/bind/tsig.key <<EOF
+              key "{{ .Values.bind9.tsigKeyName }}" {
+                algorithm hmac-sha256;
+                secret "$(cat /tsig/tsig-secret)";
+              };
+              EOF
+              chmod 640 /etc/bind/tsig.key
+
+              # Initialize zone file if missing
+              if [ ! -f /var/lib/bind/{{ .Values.bind9.zone }}.zone ]; then
+                cp /seed/zonefile /var/lib/bind/{{ .Values.bind9.zone }}.zone
+              fi
+              chown -R 100:101 /var/lib/bind /etc/bind/tsig.key
+          volumeMounts:
+            - name: bind-etc
+              mountPath: /etc/bind
+            - name: bind-data
+              mountPath: /var/lib/bind
+            - name: tsig
+              mountPath: /tsig
+              readOnly: true
+            - name: seed
+              mountPath: /seed
+              readOnly: true
+      containers:
+        - name: bind9
+          image: "{{ .Values.bind9.image.repository }}:{{ .Values.bind9.image.tag }}"
+          args:
+            - -g
+            - -c
+            - /etc/bind/named.conf
+          ports:
+            - name: dns-udp
+              containerPort: 53
+              protocol: UDP
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /etc/bind/named.conf
+              subPath: named.conf
+            - name: bind-etc
+              mountPath: /etc/bind/tsig.key
+              subPath: tsig.key
+            - name: bind-data
+              mountPath: /var/lib/bind
+            - name: cache
+              mountPath: /var/cache/bind
+          livenessProbe:
+            tcpSocket:
+              port: 53
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            tcpSocket:
+              port: 53
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: config
+          configMap:
+            name: bind9-config
+            items:
+              - key: named.conf
+                path: named.conf
+        - name: seed
+          configMap:
+            name: bind9-config
+            items:
+              - key: zonefile
+                path: zonefile
+        - name: tsig
+          secret:
+            secretName: bind9-tsig
+        - name: bind-etc
+          emptyDir: {}
+        - name: bind-data
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}

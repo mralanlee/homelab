@@ -42,6 +42,14 @@ apps:
     namespace: gateway
     path: charts/gateway
 
+  - name: bind9
+    namespace: bind9
+    path: charts/bind9
+
+  - name: external-dns
+    namespace: external-dns-internal
+    path: charts/external-dns
+
   - name: cert-manager
     namespace: cert-manager
     path: charts/cert-manager

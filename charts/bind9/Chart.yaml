@@ -1,0 +1,5 @@
+apiVersion: v2
+name: bind9
+description: Internal authoritative DNS server (BIND9) for homelab cluster zone
+type: application
+version: 0.1.0

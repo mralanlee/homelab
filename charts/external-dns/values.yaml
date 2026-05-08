@@ -1,0 +1,36 @@
+external-dns:
+  fullnameOverride: external-dns-internal
+
+  policy: sync
+  registry: txt
+  txtOwnerId: homelab
+  txtPrefix: "extdns-"
+
+  domainFilters:
+    - k8s.shimmerlabs.xyz
+
+  sources:
+    - gateway-httproute
+    - service
+    - ingress
+
+  provider:
+    name: rfc2136
+
+  extraArgs:
+    - --rfc2136-host=10.22.6.53
+    - --rfc2136-port=53
+    - --rfc2136-zone=k8s.shimmerlabs.xyz
+    - --rfc2136-tsig-keyname=externaldns-key
+    - --rfc2136-tsig-secret-alg=hmac-sha256
+    - --rfc2136-tsig-axfr
+
+  env:
+    - name: EXTERNAL_DNS_RFC2136_TSIG_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: bind9-tsig
+          key: tsig-secret
+
+  serviceMonitor:
+    enabled: false

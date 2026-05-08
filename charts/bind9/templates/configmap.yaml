@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bind9-config
+data:
+  named.conf: |
+    options {
+      directory "/var/cache/bind";
+      listen-on { any; };
+      listen-on-v6 { any; };
+      allow-query { any; };
+      recursion no;
+      forwarders { {{ range .Values.bind9.forwarders }}{{ . }}; {{ end }} };
+      dnssec-validation no;
+    };
+
+    include "/etc/bind/tsig.key";
+
+    zone "{{ .Values.bind9.zone }}" {
+      type master;
+      file "/var/lib/bind/{{ .Values.bind9.zone }}.zone";
+      allow-update { key "{{ .Values.bind9.tsigKeyName }}"; };
+      allow-transfer { key "{{ .Values.bind9.tsigKeyName }}"; };
+      journal "/var/lib/bind/{{ .Values.bind9.zone }}.zone.jnl";
+    };
+
+  zonefile: |
+    $TTL 60
+    @       IN  SOA   {{ .Values.bind9.primaryNS }}. {{ .Values.bind9.hostmaster }}. (
+                          1 ; serial
+                          3600 ; refresh
+                          900 ; retry
+                          604800 ; expire
+                          86400 ; minimum
+                          )
+    @       IN  NS    {{ .Values.bind9.primaryNS }}.
+    ns1     IN  A     {{ .Values.bind9.loadBalancerIP }}
