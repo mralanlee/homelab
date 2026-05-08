@@ -42,6 +42,10 @@ apps:
     namespace: gateway
     path: charts/gateway
 
+  - name: k8s-gateway
+    namespace: k8s-gateway
+    path: charts/k8s-gateway
+
   - name: cert-manager
     namespace: cert-manager
     path: charts/cert-manager
