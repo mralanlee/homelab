@@ -27,28 +27,13 @@ spec:
             - -c
             - |
               set -eu
-              # Build TSIG key file from secret
-              cat > /etc/bind/tsig.key <<EOF
-              key "{{ .Values.bind9.tsigKeyName }}" {
-                algorithm hmac-sha256;
-                secret "$(cat /tsig/tsig-secret)";
-              };
-              EOF
-              chmod 640 /etc/bind/tsig.key
-
-              # Initialize zone file if missing
               if [ ! -f /var/lib/bind/{{ .Values.bind9.zone }}.zone ]; then
                 cp /seed/zonefile /var/lib/bind/{{ .Values.bind9.zone }}.zone
               fi
-              chown -R 100:101 /var/lib/bind /etc/bind/tsig.key
+              chmod -R a+rwX /var/lib/bind
           volumeMounts:
-            - name: bind-etc
-              mountPath: /etc/bind
             - name: bind-data
               mountPath: /var/lib/bind
-            - name: tsig
-              mountPath: /tsig
-              readOnly: true
             - name: seed
               mountPath: /seed
               readOnly: true
@@ -70,9 +55,10 @@ spec:
             - name: config
               mountPath: /etc/bind/named.conf
               subPath: named.conf
-            - name: bind-etc
+            - name: tsig
               mountPath: /etc/bind/tsig.key
               subPath: tsig.key
+              readOnly: true
             - name: bind-data
               mountPath: /var/lib/bind
             - name: cache
@@ -103,8 +89,10 @@ spec:
         - name: tsig
           secret:
             secretName: bind9-tsig
-        - name: bind-etc
-          emptyDir: {}
+            defaultMode: 0444
+            items:
+              - key: tsig.key
+                path: tsig.key
         - name: bind-data
           emptyDir: {}
         - name: cache
