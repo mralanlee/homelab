@@ -7,6 +7,14 @@ targetRevision: main
 #   0: default (most apps)
 #  10: app-layer that depends on foundational stuff being healthy
 apps:
+  # Wave -30: Gateway API CRDs (experimental channel for Cilium compatibility)
+  - name: gateway-api-crds
+    namespace: kube-system
+    path: charts/gateway-api-crds
+    syncWave: -30
+    serverSideApply: true
+    replaceLargeCRDs: true
+
   # Wave -20: prometheus-operator CRDs (must exist before kube-prometheus-stack and any chart using ServiceMonitor)
   - name: prometheus-operator-crds
     namespace: monitoring

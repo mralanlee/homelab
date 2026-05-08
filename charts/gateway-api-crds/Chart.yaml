@@ -1,0 +1,5 @@
+apiVersion: v2
+name: gateway-api-crds
+description: Gateway API CRDs (experimental channel — v1alpha2 served for Cilium compatibility)
+type: application
+version: 0.1.0
