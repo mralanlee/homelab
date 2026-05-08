@@ -21,11 +21,9 @@ kube-prometheus-stack:
               requests:
                 storage: 50Gi
     ingress:
-      enabled: true
+      # Disabled — using Cilium Gateway API HTTPRoute (templates/httproute.yaml)
+      enabled: false
       ingressClassName: traefik
-      annotations:
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        cert-manager.io/cluster-issuer: letsencrypt-prod
       hosts:
         - prometheus.k8s.shimmerlabs.xyz
       paths:
@@ -51,11 +49,9 @@ kube-prometheus-stack:
               requests:
                 storage: 10Gi
     ingress:
-      enabled: true
+      # Disabled — using Cilium Gateway API HTTPRoute (templates/httproute.yaml)
+      enabled: false
       ingressClassName: traefik
-      annotations:
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        cert-manager.io/cluster-issuer: letsencrypt-prod
       hosts:
         - alertmanager.k8s.shimmerlabs.xyz
       paths:

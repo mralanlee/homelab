@@ -8,17 +8,11 @@ authentik:
       password: file:///postgres-creds/password
   server:
     ingress:
-      enabled: true
-      annotations:
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        cert-manager.io/cluster-issuer: letsencrypt-prod
+      # Disabled — using Cilium Gateway API HTTPRoute (templates/httproute.yaml)
+      enabled: false
       ingressClassName: traefik
       hosts:
         - authentik.k8s.shimmerlabs.xyz
-      tls:
-        - hosts:
-            - authentik.k8s.shimmerlabs.xyz
-          secretName: authentik-tls
     podAnnotations:
       reloader.stakater.com/auto: "true"
     volumes:

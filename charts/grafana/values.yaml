@@ -19,17 +19,11 @@ grafana:
       - kubernetes.io/pvc-protection
 
   ingress:
-    enabled: true
+    # Disabled — using Cilium Gateway API HTTPRoute (templates/httproute.yaml)
+    enabled: false
     ingressClassName: traefik
-    annotations:
-      traefik.ingress.kubernetes.io/router.entrypoints: websecure
-      cert-manager.io/cluster-issuer: letsencrypt-prod
     hosts:
       - grafana.k8s.shimmerlabs.xyz
-    tls:
-      - hosts:
-          - grafana.k8s.shimmerlabs.xyz
-        secretName: grafana-tls
   serviceMonitor:
     # Disabled until kube-prometheus-stack provides ServiceMonitor CRD.
     # Re-enable after monitoring stack syncs.

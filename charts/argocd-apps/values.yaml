@@ -34,10 +34,6 @@ apps:
     namespace: gateway
     path: charts/gateway
 
-  - name: traefik
-    namespace: traefik
-    path: charts/traefik
-
   - name: cert-manager
     namespace: cert-manager
     path: charts/cert-manager

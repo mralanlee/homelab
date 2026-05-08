@@ -1,22 +1,21 @@
-{{- if .Values.hubbleIngress.enabled }}
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: hubble-ui
-  namespace: {{ .Values.hubbleIngress.namespace | default .Release.Namespace }}
+  name: grafana
+  namespace: grafana
 spec:
   parentRefs:
     - name: homelab
       namespace: gateway
       sectionName: https
   hostnames:
-    - {{ required "hubbleIngress.host is required when enabling the ingress" .Values.hubbleIngress.host | quote }}
+    - grafana.k8s.shimmerlabs.xyz
   rules:
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: hubble-ui
+        - name: grafana
           port: 80
-{{- end }}
