@@ -5,8 +5,7 @@ metadata:
   name: {{ .Values.gateway.name }}
   namespace: {{ .Values.gateway.namespace }}
   annotations:
-    metallb.universe.tf/address-pool: homelab-services
-    metallb.universe.tf/loadBalancerIPs: {{ .Values.gateway.loadBalancerIP }}
+    io.cilium/lb-ipam-ips: {{ .Values.gateway.loadBalancerIP | quote }}
 spec:
   gatewayClassName: {{ .Values.gateway.className }}
   listeners:
