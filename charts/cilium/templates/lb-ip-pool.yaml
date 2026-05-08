@@ -1,0 +1,26 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: homelab-services
+spec:
+  blocks:
+    - start: 10.22.6.10
+      stop: 10.22.6.254
+    - start: 10.22.7.1
+      stop: 10.22.7.254
+    - start: 10.22.8.1
+      stop: 10.22.8.254
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: homelab-l2
+spec:
+  loadBalancerIPs: true
+  externalIPs: true
+  interfaces:
+    - eth0
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/os: linux

@@ -42,6 +42,14 @@ cilium:
     enableHealthCheck: true
 
   kubeProxyReplacement: "true"
+
+  # L2 announcements (replaces MetalLB)
+  l2announcements:
+    enabled: true
+  # Higher k8s API request burst for L2 announcement leader election
+  k8sClientRateLimit:
+    qps: 50
+    burst: 100
  
 hubbleIngress:
   enabled: true
