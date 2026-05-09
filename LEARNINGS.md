@@ -79,6 +79,16 @@ Bake into Ansible common role.
 **Fix:** Switched to Cilium L2. Or manually `kubectl label endpointslice ... kubernetes.io/service-name=...`.
 **Why:** Cilium creates synthetic EndpointSlice for Gateway with placeholder endpoint `192.192.192.192`. Doesn't add the standard service-name label, MetalLB skips it. Open Cilium issues since 2024.
 
+### externalTrafficPolicy: Local + Cilium L2 announcer mismatch
+**Problem:** bind9 LoadBalancer IP `10.22.6.53` reachable via ARP but TCP/UDP refused/dropped from clients. Worker logs showed traffic landing on the L2 announcer node, not the bind9 pod node.
+**Fix:** Set `externalTrafficPolicy: Cluster` on the LB Service. Set `Local` only when pods run on every potential announcer (DaemonSet-style).
+**Why:** Cilium L2 announces the LB IP from a leader-elected node, independent of where backend pods run. With `Local`, traffic landing on an announcer without a local backend gets dropped. `Cluster` lets eBPF forward to the pod on any node (SNATs source — fine for TSIG-authed paths).
+
+### Cilium L2 statedb empty after node reboot
+**Problem:** After a worker reboot, lease objects (`cilium-l2announce-*`) showed correct holders but `cilium-dbg shell -- db/show l2-announce` was empty. Wire-level ARP silent for both LB IPs.
+**Fix:** `kubectl -n kube-system rollout restart ds/cilium`. If that hangs on a stuck terminating pod, force-delete it (`--force --grace-period=0`). Recheck statedb across all pods (`exec ds/cilium` only hits one).
+**Why:** Agents don't always rebuild announce state from leases on partial reconcile. A clean DS restart re-emits gratuitous ARP and repopulates statedb.
+
 ## Ingress / Gateway
 
 ### Cilium Gateway API needs experimental CRDs
@@ -149,6 +159,11 @@ ignoreDifferences:
 **Fix:** Reference as `<item>/<filename-without-extension>`. The "field" for an attached document is the filename label.
 **Why:** 1Password SDK exposes documents via field-style access using the filename.
 
+### ESO `template.data` renders full file content; avoids init-container chown dance
+**Problem:** bind9 needed a `tsig.key` block (full BIND syntax) built from a raw secret. First attempt: init container read raw secret, wrote `/etc/bind/tsig.key`, `chown 100:101`. Failed with `open: /etc/bind/tsig.key: permission denied` — image's `bind` user UID didn't match the hardcoded `100:101`.
+**Fix:** Use ExternalSecret `spec.target.template.data` (engine v2) to render the full key block at sync time. Mount the resulting Secret directly with `defaultMode: 0444` and a subPath. Helm escapes ESO Go templates with backticks: `{{ ` `` `{{ .secret }}` `` ` }}`.
+**Why:** Init containers + chown couple chart to specific image user IDs. ESO templates produce ready-to-mount files; `0444` is readable by any container user, no chown needed.
+
 ## Authentication
 
 ### authentik fresh install needs OIDC application setup
@@ -196,6 +211,16 @@ Pod DNS path: pod → CoreDNS (10.96.0.10) → node's `/etc/resolv.conf` upstrea
 
 ### Cluster has no internal DNS for arbitrary k8s hostnames
 Workaround: deploy `k8s-gateway` (CoreDNS plugin) or run authoritative DNS server + external-dns RFC2136. OPNsense Unbound is recursive only.
+
+### OPNsense Unbound Query Forwarding entry needs Apply
+**Problem:** Added Domain Override (`k8s.shimmerlabs.xyz` → `10.22.6.53`). Entry visible + enabled in UI but `dig @10.22.0.1` returned empty. Direct `dig @10.22.6.53` worked.
+**Fix:** Click **Apply** on the Query Forwarding page. Restart Unbound if still stale.
+**Why:** Saving a row doesn't reload Unbound's running config. UI shows the row as enabled before it's actually in the running zone list.
+
+### CoreDNS loop after upstream resolver change
+**Problem:** `[FATAL] plugin/loop: Loop (127.0.0.1:xxxxx -> :53) detected for zone "."`. CoreDNS Corefile uses `forward . /etc/resolv.conf`; pod's resolv.conf pointed back at CoreDNS service IP after host resolver state shifted.
+**Fix:** Replace `forward . /etc/resolv.conf` with explicit upstream: `forward . 10.22.0.1 8.8.8.8`. `kubectl -n kube-system rollout restart deploy/coredns`.
+**Why:** `dnsPolicy: Default` means CoreDNS pod inherits node resolv.conf. If that ever resolves the cluster IP (or if `dnsPolicy` is misconfigured to `ClusterFirst`), CoreDNS forwards to itself.
 
 ## Anti-Patterns to Avoid
 
