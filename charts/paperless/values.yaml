@@ -22,3 +22,6 @@ ingress:
   gatewayName: homelab
   gatewayNamespace: gateway
   gatewaySectionName: https
+
+valkey:
+  image: valkey/valkey:8-alpine

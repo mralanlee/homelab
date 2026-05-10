@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-valkey
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+    app.kubernetes.io/component: valkey
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: paperless
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: valkey
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: paperless
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: valkey
+    spec:
+      containers:
+        - name: valkey
+          image: {{ .Values.valkey.image | default "valkey/valkey:8-alpine" }}
+          args:
+            - --save
+            - ""
+            - --appendonly
+            - "no"
+          ports:
+            - name: redis
+              containerPort: 6379
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          emptyDir: {}
