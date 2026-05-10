@@ -16,3 +16,9 @@ oidc:
   authentikNamespace: authentik
   providerSlug: paperless
   applicationSlug: paperless
+
+ingress:
+  hostname: paperless.k8s.shimmerlabs.xyz
+  gatewayName: homelab
+  gatewayNamespace: gateway
+  gatewaySectionName: https
