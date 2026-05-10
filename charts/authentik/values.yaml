@@ -15,30 +15,52 @@ authentik:
         - authentik.k8s.shimmerlabs.xyz
     podAnnotations:
       reloader.stakater.com/auto: "true"
+    envFrom:
+      - secretRef:
+          name: paperless-oidc-for-authentik
+          optional: true
     volumes:
       - name: postgres-creds
         secret:
           secretName: authentik-db-auth
+      - name: paperless-blueprint
+        configMap:
+          name: paperless-blueprint
+          optional: true
     volumeMounts:
       - name: postgres-creds
         mountPath: /postgres-creds
+        readOnly: true
+      - name: paperless-blueprint
+        mountPath: /blueprints/paperless
         readOnly: true
 
     metrics:
       serviceMonitor:
         enabled: true
         namespace: prometheus
-      
+
   worker:
     podAnnotations:
       reloader.stakater.com/auto: "true"
+    envFrom:
+      - secretRef:
+          name: paperless-oidc-for-authentik
+          optional: true
     volumes:
       - name: postgres-creds
         secret:
           secretName: authentik-db-auth
+      - name: paperless-blueprint
+        configMap:
+          name: paperless-blueprint
+          optional: true
     volumeMounts:
       - name: postgres-creds
         mountPath: /postgres-creds
+        readOnly: true
+      - name: paperless-blueprint
+        mountPath: /blueprints/paperless
         readOnly: true
     metrics:
       serviceMonitor:
