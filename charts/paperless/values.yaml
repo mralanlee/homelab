@@ -2,3 +2,7 @@
 # Sub-chart gated by `condition: paperless-ngx.enabled` in Chart.yaml.
 paperless-ngx:
   enabled: false
+
+postgres:
+  storageSize: 5Gi
+  storageClass: truenas-iscsi

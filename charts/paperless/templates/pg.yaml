@@ -1,0 +1,40 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Release.Name }}-pg
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+spec:
+  description: "PostgreSQL Cluster for {{ .Release.Name }}"
+  imageName: ghcr.io/cloudnative-pg/postgresql:18
+  instances: 1
+  storage:
+    size: {{ .Values.postgres.storageSize | default "5Gi" }}
+    storageClass: {{ .Values.postgres.storageClass | default "truenas-iscsi" }}
+  postgresql:
+    parameters:
+      shared_buffers: 256MB
+      max_connections: "100"
+  managed:
+    roles:
+      - name: paperless
+        inherit: true
+        connectionLimit: -1
+        ensure: present
+        superuser: false
+        login: true
+        passwordSecret:
+          name: {{ .Release.Name }}-db-auth
+          key: password
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+spec:
+  name: {{ .Release.Name }}
+  owner: paperless
+  cluster:
+    name: {{ .Release.Name }}-pg
