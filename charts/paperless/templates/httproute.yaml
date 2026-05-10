@@ -1,0 +1,48 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Name }}-ngx
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+spec:
+  parentRefs:
+    - name: {{ .Values.ingress.gatewayName | default "homelab" }}
+      namespace: {{ .Values.ingress.gatewayNamespace | default "gateway" }}
+      sectionName: {{ .Values.ingress.gatewaySectionName | default "https" }}
+  hostnames:
+    - {{ .Values.ingress.hostname }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {{ .Release.Name }}-paperless-ngx
+          port: 8000
+{{- if and .Values.gpt.enabled .Values.gpt.ingress.enabled }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Name }}-gpt
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+spec:
+  parentRefs:
+    - name: {{ .Values.ingress.gatewayName | default "homelab" }}
+      namespace: {{ .Values.ingress.gatewayNamespace | default "gateway" }}
+      sectionName: {{ .Values.ingress.gatewaySectionName | default "https" }}
+  hostnames:
+    - {{ .Values.gpt.ingress.hostname }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {{ .Release.Name }}-gpt
+          port: 8080
+{{- end }}
