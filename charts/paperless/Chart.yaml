@@ -1,0 +1,11 @@
+apiVersion: v2
+name: paperless
+description: paperless-ngx + paperless-gpt for the homelab
+type: application
+version: 0.1.0
+appVersion: "2.20.15"
+dependencies:
+  - name: paperless-ngx
+    version: 0.24.1
+    repository: https://charts.gabe565.com
+    condition: paperless-ngx.enabled
