@@ -25,7 +25,6 @@ spec:
         login: true
         passwordSecret:
           name: {{ .Release.Name }}-db-auth
-          key: password
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
