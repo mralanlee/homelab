@@ -1,4 +1,4 @@
 # Full values surface populated in later tasks.
-# Sub-chart key disabled here so `helm template` works at this stage.
+# Sub-chart gated by `condition: paperless-ngx.enabled` in Chart.yaml.
 paperless-ngx:
   enabled: false
