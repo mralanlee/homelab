@@ -129,8 +129,12 @@ celery and ngx are protocol-only consumers.
 
 ### 4. paperless-ngx (gabe565 chart)
 
+The gabe565 chart is at version 0.24.1 with appVersion 2.14.7 (Feb 2025).
+Upstream paperless-ngx is at v2.20.15 (Apr 2026). Override `image.tag` to use
+the newer image while reusing the chart's templates.
+
 Override values.yaml:
-- `image.tag` aligned to chart appVersion (currently 2.14.7).
+- `image.tag: "2.20.15"` (override chart appVersion default 2.14.7).
 - `persistence.data` single PVC 50Gi `truenas-iscsi`, ReadWriteOnce. Other
   persistence keys (`media`, `consume`, `export`) point at the same PVC with
   distinct `subPath` values.
@@ -182,7 +186,7 @@ of truth = 1Password.
 ### 6. paperless-gpt
 
 Deployment:
-- image: `icereed/paperless-gpt:v0.16.0` (pin a tag; bump deliberately).
+- image: `icereed/paperless-gpt:v0.25.1` (pin a tag; bump deliberately).
 - 1 replica, no PVC, ephemeral.
 - envFrom secret `paperless-gpt`:
   - `LLM_PROVIDER=openai`
@@ -291,7 +295,7 @@ path automatically.
 ```yaml
 paperless-ngx:
   image:
-    tag: "2.14.7"
+    tag: "2.20.15"
   persistence:
     data:
       enabled: true
@@ -322,7 +326,7 @@ gpt:
   enabled: true
   image:
     repository: icereed/paperless-gpt
-    tag: v0.16.0
+    tag: v0.25.1
   provider: openai           # openai | ollama
   model: gpt-4o-mini
   ingress:
@@ -345,6 +349,14 @@ externalSecrets:
   `data`/`media`/`consume`/`export` keys with `existingClaim` + `subPath`
   knobs. If not, fall back to four PVCs or override the chart's volume
   rendering via inline patches in `values.yaml`. Verify during implementation.
+- **Image tag drift from chart appVersion.** The gabe565 chart is pinned at
+  appVersion 2.14.7 but the homelab will run 2.20.15. Verify during
+  implementation that no env vars, settings keys, or template assumptions
+  baked into the chart break against the newer image. Watch the changelog
+  between v2.14 and v2.20 for any required `PAPERLESS_*` migrations
+  (notably any allauth/socialaccount changes between minors). If the chart
+  hard-codes incompatible env, fall back to either an older image tag or a
+  hand-rolled Deployment without the chart dependency.
 - **OIDC env JSON.** Resolved by ESO templating (§5): the ExternalSecret
   renders the full JSON with substituted secrets into a Secret key the ngx
   pod consumes via `envFrom`. No initContainer needed.
