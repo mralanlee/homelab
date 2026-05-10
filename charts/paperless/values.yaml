@@ -1,7 +1,88 @@
-# Full values surface populated in later tasks.
 # Sub-chart gated by `condition: paperless-ngx.enabled` in Chart.yaml.
+# This chart is built on bjw-s common library v1.5.1 (legacy schema).
+# - `env` and `envFrom` are top-level keys (not under controllers.main.containers.main).
+# - persistence uses `type: pvc` (not `persistentVolumeClaim`) and supports a list-form
+#   `subPath: [{path, mountPath}, ...]` for multiple mounts off a single PVC. There is
+#   no `advancedMounts` in this version.
 paperless-ngx:
-  enabled: false
+  enabled: true
+
+  image:
+    repository: ghcr.io/paperless-ngx/paperless-ngx
+    tag: "2.20.15"
+
+  # Disable upstream ingress; we use Gateway API HTTPRoute (templates/httproute.yaml).
+  ingress:
+    main:
+      enabled: false
+
+  service:
+    main:
+      ports:
+        http:
+          port: 8000
+
+  # Disable upstream-bundled subcharts; we run our own cn-pg and Valkey.
+  postgresql:
+    enabled: false
+  mariadb:
+    enabled: false
+  redis:
+    enabled: false
+
+  env:
+    PAPERLESS_URL: https://paperless.k8s.shimmerlabs.xyz
+    PAPERLESS_REDIS: redis://paperless-valkey:6379
+    PAPERLESS_DBHOST: paperless-pg-rw
+    PAPERLESS_DBNAME: paperless
+    PAPERLESS_TIME_ZONE: America/Los_Angeles
+    PAPERLESS_OCR_LANGUAGE: eng
+    PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+    PAPERLESS_DISABLE_REGULAR_LOGIN: "false"
+
+  envFrom:
+    - secretRef:
+        name: paperless-db-auth
+    - secretRef:
+        name: paperless-superuser
+    - secretRef:
+        name: paperless-oidc
+
+  # Single PVC fanned out into four mountPaths via subPath (bjw-s common 1.5.1 list form).
+  persistence:
+    data:
+      enabled: true
+      type: pvc
+      storageClass: truenas-iscsi
+      accessMode: ReadWriteOnce
+      size: 50Gi
+      retain: true
+      # Override the upstream default mountPath (/usr/src/paperless/data) so the
+      # list-form subPath below is allowed.
+      mountPath: ""
+      subPath:
+        - path: data
+          mountPath: /usr/src/paperless/data
+        - path: media
+          mountPath: /usr/src/paperless/media
+        - path: consume
+          mountPath: /usr/src/paperless/consume
+        - path: export
+          mountPath: /usr/src/paperless/export
+    media:
+      enabled: false
+    consume:
+      enabled: false
+    export:
+      enabled: false
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
 
 postgres:
   storageSize: 5Gi
