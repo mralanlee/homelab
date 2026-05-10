@@ -6,3 +6,6 @@ paperless-ngx:
 postgres:
   storageSize: 5Gi
   storageClass: truenas-iscsi
+
+externalSecrets:
+  store: onepassword-sdk
