@@ -9,3 +9,9 @@ postgres:
 
 externalSecrets:
   store: onepassword-sdk
+
+oidc:
+  enabled: true
+  authentikUrl: https://authentik.k8s.shimmerlabs.xyz
+  providerSlug: paperless
+  applicationSlug: paperless
