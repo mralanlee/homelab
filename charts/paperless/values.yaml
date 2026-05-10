@@ -25,3 +25,15 @@ ingress:
 
 valkey:
   image: valkey/valkey:8-alpine
+
+gpt:
+  enabled: true
+  image:
+    repository: icereed/paperless-gpt
+    tag: v0.25.1
+  provider: openai
+  model: gpt-4o-mini
+  ollamaHost: ""
+  ingress:
+    enabled: false
+    hostname: paperless-gpt.k8s.shimmerlabs.xyz

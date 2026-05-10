@@ -1,0 +1,52 @@
+{{- if .Values.gpt.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-gpt
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+    app.kubernetes.io/component: gpt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: paperless
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: gpt
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: paperless
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: gpt
+    spec:
+      containers:
+        - name: paperless-gpt
+          image: "{{ .Values.gpt.image.repository }}:{{ .Values.gpt.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: PAPERLESS_BASE_URL
+              value: "http://{{ .Release.Name }}-paperless-ngx:8000"
+            - name: LLM_PROVIDER
+              value: {{ .Values.gpt.provider | quote }}
+            - name: LLM_MODEL
+              value: {{ .Values.gpt.model | quote }}
+            {{- if eq .Values.gpt.provider "ollama" }}
+            - name: OLLAMA_HOST
+              value: {{ .Values.gpt.ollamaHost | quote }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ .Release.Name }}-gpt
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+{{- end }}
