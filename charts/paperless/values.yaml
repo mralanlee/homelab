@@ -13,5 +13,6 @@ externalSecrets:
 oidc:
   enabled: true
   authentikUrl: https://authentik.k8s.shimmerlabs.xyz
+  authentikNamespace: authentik
   providerSlug: paperless
   applicationSlug: paperless
