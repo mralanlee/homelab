@@ -30,6 +30,8 @@ paperless-ngx:
   redis:
     enabled: false
 
+  # NOTE: PAPERLESS_REDIS/DBHOST below pin release name to `paperless`.
+  # Service DNS names are <release>-valkey and <release>-pg-rw.
   env:
     PAPERLESS_URL: https://paperless.k8s.shimmerlabs.xyz
     PAPERLESS_REDIS: redis://paperless-valkey:6379
