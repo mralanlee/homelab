@@ -4,12 +4,14 @@
       "Bash(git:*)",
       "mcp__proxmox-mcp-plus__get_vms",
       "mcp__proxmox-mcp-plus__get_node_status",
-      "mcp__proxmox-mcp-plus__get_containers"
+      "mcp__proxmox-mcp-plus__get_containers",
+      "mcp__proxmox-mcp-plus__get_cluster_status",
+      "mcp__proxmox-mcp-plus__get_nodes"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "proxmox-mcp-plus",
     "kubernetes"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }
