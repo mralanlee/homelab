@@ -118,5 +118,5 @@ gpt:
   model: gpt-4o-mini
   ollamaHost: ""
   ingress:
-    enabled: false
+    enabled: true
     hostname: paperless-gpt.k8s.shimmerlabs.xyz
