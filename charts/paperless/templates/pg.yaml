@@ -11,6 +11,13 @@ spec:
   storage:
     size: {{ .Values.postgres.storageSize | default "5Gi" }}
     storageClass: {{ .Values.postgres.storageClass | default "truenas-iscsi" }}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
   postgresql:
     parameters:
       shared_buffers: 256MB
