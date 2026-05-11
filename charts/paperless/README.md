@@ -15,13 +15,14 @@ Wraps `paperless-ngx` (gabe565 chart 0.24.1, image override 2.20.15) with:
 | Item | Fields |
 |---|---|
 | `paperless-superuser` | `username`, `password`, `email` |
-| `paperless-oidc` | `client_id`, `client_secret` (32-hex each) |
-| `paperless-gpt` | `openai_api_key`, `paperless_api_token` (start empty) |
+| `paperless-oidc` | `client_id`, `credential` (client_secret, 32-hex each) |
+| `paperless-openai-api-key` | `credential` (OpenAI API key) |
+| `paperless-api-token` | `credential` (paperless API token, start empty) |
 
 Generate the OIDC creds locally:
 ```sh
 openssl rand -hex 32  # client_id
-openssl rand -hex 32  # client_secret
+openssl rand -hex 32  # credential (client_secret)
 ```
 
 ## Bootstrap
@@ -45,7 +46,7 @@ kubectl -n paperless rollout status deploy/paperless-paperless-ngx --timeout=5m
 #    `/blueprints/paperless/paperless.yaml`.
 
 # 5. In paperless, generate an API token (Admin → Tokens) for the gpt service.
-#    Save it into the 1Password item `paperless-gpt.paperless_api_token`.
+#    Save it into the 1Password item `paperless-api-token.credential`.
 #    ESO syncs; restart gpt:
 kubectl -n paperless rollout restart deploy/paperless-gpt
 ```
