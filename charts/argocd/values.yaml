@@ -100,4 +100,7 @@ argo-cd:
 
   dex:
     enabled: true
-
+    livenessProbe:
+      enabled: true
+    readinessProbe:
+      enabled: true
