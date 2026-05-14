@@ -10,6 +10,9 @@ external-secrets:
     interval: 30s
     scrapeTimeout: 10s
 
+  extraArgs:
+    store-requeue-interval: 30m
+
 reloader:
   logFormat: json
   enableMetricsByNamespace: true
