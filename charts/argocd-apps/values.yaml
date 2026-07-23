@@ -70,6 +70,12 @@ apps:
     namespace: grafana
     path: charts/grafana
 
+  # Wave 10: custom Grafana dashboards — needs grafana (sidecar) healthy first
+  - name: homelab-dashboards
+    namespace: grafana
+    path: charts/homelab-dashboards
+    syncWave: 10
+
   # Wave 10: depends on cn-pg + cert-manager + external-secrets
   - name: authentik
     namespace: authentik

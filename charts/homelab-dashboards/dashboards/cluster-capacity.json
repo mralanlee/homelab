@@ -1,0 +1,306 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 0,
+  "time": { "from": "now-6h", "to": "now" },
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["homelab", "capacity"],
+  "title": "Cluster Capacity & Headroom",
+  "uid": "homelab-cluster-capacity",
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "label": "Datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "prometheus" },
+        "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Cluster CPU",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "CPU Allocatable",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 5, "x": 0, "y": 1 },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 1 }, "overrides": [] },
+      "options": { "colorMode": "none", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(kube_node_status_allocatable{resource=\"cpu\"})" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "CPU Requested",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 5, "x": 5, "y": 1 },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 1 }, "overrides": [] },
+      "options": { "colorMode": "none", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\"})" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "CPU Used (rate 5m)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 4, "x": 10, "y": 1 },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 1 }, "overrides": [] },
+      "options": { "colorMode": "none", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\"}[5m]))" }
+      ]
+    },
+    {
+      "type": "gauge",
+      "title": "CPU Schedulable Headroom",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 5, "x": 14, "y": 1 },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100,
+        "thresholds": { "mode": "absolute", "steps": [
+          { "color": "red", "value": null }, { "color": "yellow", "value": 10 }, { "color": "green", "value": 25 } ] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdMarkers": true },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "100 * (1 - sum(kube_pod_container_resource_requests{resource=\"cpu\"}) / sum(kube_node_status_allocatable{resource=\"cpu\"}))" }
+      ]
+    },
+    {
+      "type": "gauge",
+      "title": "CPU Live Headroom",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 5, "x": 19, "y": 1 },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100,
+        "thresholds": { "mode": "absolute", "steps": [
+          { "color": "red", "value": null }, { "color": "yellow", "value": 10 }, { "color": "green", "value": 25 } ] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdMarkers": true },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "100 * (1 - sum(rate(node_cpu_seconds_total{mode!=\"idle\"}[5m])) / sum(kube_node_status_allocatable{resource=\"cpu\"}))" }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Cluster Memory",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 }
+    },
+    {
+      "type": "stat",
+      "title": "Memory Allocatable",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 5, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "bytes", "decimals": 1 }, "overrides": [] },
+      "options": { "colorMode": "none", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(kube_node_status_allocatable{resource=\"memory\"})" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Memory Requested",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 5, "x": 5, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "bytes", "decimals": 1 }, "overrides": [] },
+      "options": { "colorMode": "none", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\"})" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Memory Used",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 4, "x": 10, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "bytes", "decimals": 1 }, "overrides": [] },
+      "options": { "colorMode": "none", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)" }
+      ]
+    },
+    {
+      "type": "gauge",
+      "title": "Memory Schedulable Headroom",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 5, "x": 14, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100,
+        "thresholds": { "mode": "absolute", "steps": [
+          { "color": "red", "value": null }, { "color": "yellow", "value": 10 }, { "color": "green", "value": 25 } ] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdMarkers": true },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "100 * (1 - sum(kube_pod_container_resource_requests{resource=\"memory\"}) / sum(kube_node_status_allocatable{resource=\"memory\"}))" }
+      ]
+    },
+    {
+      "type": "gauge",
+      "title": "Memory Live Headroom",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 5, "x": 19, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100,
+        "thresholds": { "mode": "absolute", "steps": [
+          { "color": "red", "value": null }, { "color": "yellow", "value": 10 }, { "color": "green", "value": 25 } ] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdMarkers": true },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "100 * (1 - sum(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / sum(kube_node_status_allocatable{resource=\"memory\"}))" }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Trends",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 }
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU: allocatable vs requested vs used",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 10 } }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "legendFormat": "allocatable", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(kube_node_status_allocatable{resource=\"cpu\"})" },
+        { "refId": "B", "legendFormat": "requested", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\"})" },
+        { "refId": "C", "legendFormat": "used", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\"}[5m]))" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Memory: allocatable vs requested vs used",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
+      "fieldConfig": { "defaults": { "unit": "bytes", "custom": { "fillOpacity": 10 } }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "legendFormat": "allocatable", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(kube_node_status_allocatable{resource=\"memory\"})" },
+        { "refId": "B", "legendFormat": "requested", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\"})" },
+        { "refId": "C", "legendFormat": "used", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)" }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Per-Node Headroom",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 }
+    },
+    {
+      "type": "table",
+      "title": "Per-node capacity",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 24 },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "CPU alloc" }, "properties": [ { "id": "unit", "value": "short" }, { "id": "decimals", "value": 2 } ] },
+          { "matcher": { "id": "byName", "options": "CPU req" }, "properties": [ { "id": "unit", "value": "short" }, { "id": "decimals", "value": 2 } ] },
+          { "matcher": { "id": "byName", "options": "CPU used" }, "properties": [ { "id": "unit", "value": "short" }, { "id": "decimals", "value": 2 } ] },
+          { "matcher": { "id": "byName", "options": "CPU headroom" }, "properties": [ { "id": "unit", "value": "short" }, { "id": "decimals", "value": 2 } ] },
+          { "matcher": { "id": "byName", "options": "Mem alloc" }, "properties": [ { "id": "unit", "value": "bytes" } ] },
+          { "matcher": { "id": "byName", "options": "Mem req" }, "properties": [ { "id": "unit", "value": "bytes" } ] },
+          { "matcher": { "id": "byName", "options": "Mem used" }, "properties": [ { "id": "unit", "value": "bytes" } ] },
+          { "matcher": { "id": "byName", "options": "Mem headroom" }, "properties": [ { "id": "unit", "value": "bytes" } ] }
+        ]
+      },
+      "options": { "showHeader": true },
+      "targets": [
+        { "refId": "A", "format": "table", "instant": true, "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by(node)(kube_node_status_allocatable{resource=\"cpu\"})" },
+        { "refId": "B", "format": "table", "instant": true, "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by(node)(kube_pod_container_resource_requests{resource=\"cpu\"})" },
+        { "refId": "C", "format": "table", "instant": true, "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by(node)(label_replace(rate(node_cpu_seconds_total{mode!=\"idle\"}[5m]) * on(instance) group_left(nodename) node_uname_info, \"node\", \"$1\", \"nodename\", \"(.*)\"))" },
+        { "refId": "D", "format": "table", "instant": true, "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by(node)(kube_node_status_allocatable{resource=\"memory\"})" },
+        { "refId": "E", "format": "table", "instant": true, "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by(node)(kube_pod_container_resource_requests{resource=\"memory\"})" },
+        { "refId": "F", "format": "table", "instant": true, "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by(node)(label_replace((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) * on(instance) group_left(nodename) node_uname_info, \"node\", \"$1\", \"nodename\", \"(.*)\"))" },
+        { "refId": "G", "format": "table", "instant": true, "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "count by(node)(kube_pod_info)" },
+        { "refId": "H", "format": "table", "instant": true, "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by(node)(kube_node_status_capacity{resource=\"pods\"})" }
+      ],
+      "transformations": [
+        { "id": "merge", "options": {} },
+        { "id": "calculateField", "options": { "mode": "binary", "alias": "CPU headroom",
+          "binary": { "left": "Value #A", "operator": "-", "right": "Value #B" }, "replaceFields": false } },
+        { "id": "calculateField", "options": { "mode": "binary", "alias": "Mem headroom",
+          "binary": { "left": "Value #D", "operator": "-", "right": "Value #E" }, "replaceFields": false } },
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true },
+          "renameByName": {
+            "node": "Node",
+            "Value #A": "CPU alloc", "Value #B": "CPU req", "Value #C": "CPU used",
+            "Value #D": "Mem alloc", "Value #E": "Mem req", "Value #F": "Mem used",
+            "Value #G": "Pods", "Value #H": "Pod capacity"
+          },
+          "indexByName": {
+            "node": 0,
+            "Value #A": 1, "Value #B": 2, "Value #C": 3, "CPU headroom": 4,
+            "Value #D": 5, "Value #E": 6, "Value #F": 7, "Mem headroom": 8,
+            "Value #G": 9, "Value #H": 10
+          }
+        } }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Capacity Projection (estimate)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 }
+    },
+    {
+      "type": "stat",
+      "title": "More avg pods — CPU bound",
+      "description": "Estimate: schedulable CPU headroom / average per-pod CPU request. Approximate — average pod size hides bimodal workloads.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 35 },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "floor((sum(kube_node_status_allocatable{resource=\"cpu\"}) - sum(kube_pod_container_resource_requests{resource=\"cpu\"})) / (sum(kube_pod_container_resource_requests{resource=\"cpu\"}) / count(kube_pod_status_phase{phase=\"Running\"} == 1)))" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "More avg pods — Memory bound",
+      "description": "Estimate: schedulable memory headroom / average per-pod memory request. Approximate — average pod size hides bimodal workloads.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 35 },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "floor((sum(kube_node_status_allocatable{resource=\"memory\"}) - sum(kube_pod_container_resource_requests{resource=\"memory\"})) / (sum(kube_pod_container_resource_requests{resource=\"memory\"}) / count(kube_pod_status_phase{phase=\"Running\"} == 1)))" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Running pods",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 35 },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 }, "overrides": [] },
+      "options": { "colorMode": "none", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "count(kube_pod_status_phase{phase=\"Running\"} == 1)" }
+      ]
+    }
+  ]
+}

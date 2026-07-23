@@ -42,7 +42,31 @@ grafana:
     limits:
       cpu: 500m
       memory: 1Gi
-  
+
+  # Prometheus datasource — provisioned via GitOps so it survives pod/PVC loss.
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          uid: prometheus
+          type: prometheus
+          access: proxy
+          url: http://kube-prometheus-stack-prometheus.monitoring.svc:9090
+          isDefault: true
+
+  # Sidecar auto-discovers dashboard ConfigMaps labeled grafana_dashboard=1
+  # (e.g. from the homelab-dashboards chart) in the grafana namespace.
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      folderAnnotation: grafana_folder
+      provider:
+        foldersFromFilesStructure: true
+      searchNamespace: grafana
+
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1

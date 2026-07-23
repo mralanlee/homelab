@@ -1,0 +1,5 @@
+# Grafana folder the dashboards land in (via sidecar folderAnnotation).
+folder: Homelab
+
+# Label the Grafana dashboard sidecar watches for.
+sidecarLabel: grafana_dashboard
