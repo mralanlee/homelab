@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-cluster-capacity
+  labels:
+    {{ .Values.sidecarLabel }}: "1"
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    grafana_folder: {{ .Values.folder | quote }}
+data:
+  cluster-capacity.json: |-
+{{ .Files.Get "dashboards/cluster-capacity.json" | indent 4 }}

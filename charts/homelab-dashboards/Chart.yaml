@@ -1,0 +1,6 @@
+apiVersion: v2
+name: homelab-dashboards
+description: Custom Grafana dashboards for the homelab cluster, delivered as sidecar-discovered ConfigMaps.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
