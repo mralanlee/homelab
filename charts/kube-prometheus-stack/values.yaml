@@ -61,3 +61,44 @@ kube-prometheus-stack:
         - secretName: wildcard-k8s-shimmerlabs
           hosts:
             - alertmanager.k8s.shimmerlabs.xyz
+  # Storage / ingestion watchdog. Catches the silent iSCSI ext4 read-only
+  # freeze that stalled Prometheus for 15 days: a transient TrueNAS write
+  # error latches ext4 RO, the pod keeps serving reads and stays Ready, and
+  # nothing else notices. See memory: iscsi_ext4_ro_silent_freeze.
+  additionalPrometheusRulesMap:
+    storage-watchdog:
+      groups:
+        - name: storage-watchdog.rules
+          rules:
+            - alert: NodeFilesystemReadOnly
+              expr: node_filesystem_readonly{fstype!~"tmpfs|ramfs|overlay|iso9660|squashfs|autofs"} == 1
+              for: 5m
+              labels:
+                severity: critical
+              annotations:
+                summary: "Filesystem read-only on {{ $labels.instance }}:{{ $labels.mountpoint }}"
+                description: >-
+                  {{ $labels.device }} at {{ $labels.mountpoint }} on
+                  {{ $labels.instance }} is read-only; writes fail silently.
+                  Likely a latched ext4 journal-abort after an iSCSI I/O error.
+                  Delete the consuming pod to re-stage the volume RW.
+            - alert: PrometheusWALWritesFailing
+              expr: rate(prometheus_tsdb_wal_writes_failed_total[5m]) > 0
+              for: 5m
+              labels:
+                severity: critical
+              annotations:
+                summary: "Prometheus WAL writes failing on {{ $labels.instance }}"
+                description: >-
+                  {{ $labels.instance }} cannot write its WAL; ingestion is
+                  stalling. Storage is likely read-only.
+            - alert: PrometheusNotIngesting
+              expr: (time() - prometheus_tsdb_head_max_time / 1000) > 600
+              for: 10m
+              labels:
+                severity: critical
+              annotations:
+                summary: "Prometheus not ingesting on {{ $labels.instance }}"
+                description: >-
+                  {{ $labels.instance }} head block has not advanced in over
+                  10 minutes; scraping has stalled.
