@@ -1,4 +1,4 @@
-# Homelab
+# Homelab X
 
 Kubernetes homelab on Proxmox. Fully reproducible — control plane provisioned as LXC, workers as VMs, K8s bootstrapped via Ansible, workloads managed via ArgoCD.
 
