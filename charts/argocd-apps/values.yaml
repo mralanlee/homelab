@@ -70,6 +70,16 @@ apps:
     namespace: grafana
     path: charts/grafana
 
+  # Wave 10: ArgoCD self-management. Depends on cert-manager (server cert),
+  # external-secrets (dex + repo creds), and gateway (HTTPRoute) — all wave 0.
+  # ServerSideApply required: argo-cd CRDs (Application/ApplicationSet/AppProject)
+  # exceed the client-side last-applied annotation size limit.
+  - name: argocd
+    namespace: argocd
+    path: charts/argocd
+    syncWave: 10
+    serverSideApply: true
+
   # Wave 10: custom Grafana dashboards — needs grafana (sidecar) healthy first
   - name: homelab-dashboards
     namespace: grafana

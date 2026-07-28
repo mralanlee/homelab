@@ -98,12 +98,12 @@ helm dependency update charts/cert-manager
 helm install cert-manager charts/cert-manager -n cert-manager --create-namespace
 kubectl -n cert-manager wait --for=condition=Available deployment --all --timeout=300s
 
-# Step 5: ArgoCD
+# Step 5: ArgoCD — bootstrap once by hand; it self-manages after
 helm dependency update charts/argocd
 helm install argocd charts/argocd -n argocd --create-namespace
 kubectl -n argocd wait --for=condition=Available deployment/argocd-server --timeout=300s
 
-# Step 6: app-of-apps — ArgoCD takes over from here
+# Step 6: app-of-apps — ArgoCD takes over from here (including managing itself)
 helm dependency update charts/argocd-apps
 helm install argocd-apps charts/argocd-apps -n argocd
 ```
