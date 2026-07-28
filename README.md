@@ -2,6 +2,8 @@
 
 Kubernetes homelab on Proxmox. Fully reproducible — control plane provisioned as LXC, workers as VMs, K8s bootstrapped via Ansible, workloads managed via ArgoCD.
 
+This repository is managed with GitOps.
+
 ## Prerequisites
 
 - [Nix](https://nixos.org/download/) with flakes enabled
