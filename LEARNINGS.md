@@ -201,8 +201,10 @@ kubectl -n argocd rollout restart deployment argocd-server
 ```
 **Watch out for:** Shell `$2b$` expansion — use single quotes or YAML file patch.
 
-### app-of-apps doesn't manage ArgoCD itself
-ArgoCD is installed manually via helm. App-of-apps generates Applications for the rest. Updating ArgoCD = `helm upgrade argocd charts/argocd -n argocd`.
+### ArgoCD self-manages via app-of-apps
+ArgoCD is bootstrapped once manually (`helm install argocd charts/argocd -n argocd`), then adopts itself — the `argocd` entry in `charts/argocd-apps/values.yaml` makes app-of-apps generate an Application for `charts/argocd`. After bootstrap, updates land via git push (auto-sync), no more `helm upgrade`.
+**Requires `ServerSideApply=true`** on the self-managed app: the argo-cd chart's CRDs (Application/ApplicationSet/AppProject) exceed the client-side last-applied-configuration annotation size limit (262KB) and fail a normal sync.
+**Footgun:** the app carries the `resources-finalizer` — deleting the `argocd` Application cascade-deletes ArgoCD itself. Prune the entry from values.yaml instead of `kubectl delete application argocd`.
 
 ## DNS
 
