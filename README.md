@@ -1,5 +1,7 @@
 # Homelab
 
+LAST UPDATED: 2026-07-30
+
 Kubernetes homelab on Proxmox. Fully reproducible — control plane provisioned as LXC, workers as VMs, K8s bootstrapped via Ansible, workloads managed via ArgoCD.
 
 This repository is managed with GitOps.
