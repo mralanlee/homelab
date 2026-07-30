@@ -17,7 +17,7 @@ spec:
         type: git
         url: https://github.com/mralanlee/lace.git
         username: mralanlee
-        password: "{{ .pat }}"
+        password: {{ `{{ .pat }}` | quote }}
   data:
     - secretKey: pat
       remoteRef:
