@@ -7,7 +7,7 @@ This runbook documents how to seed the Jellyfin Kubernetes config PVC with the e
 - Access to the Dockge LXC host where the source Jellyfin config lives at `/apps/jellyfin/config`
 - Access to a workstation where `kubectl` is configured for cluster access (kubeconfig available)
 - `kubectl` CLI tool installed on the workstation
-- The Jellyfin Helm chart deployed in the `jellyfin` namespace with a `jellyfin-jellyfin` deployment and config PVC
+- The Jellyfin Helm chart deployed in the `jellyfin` namespace with a `jellyfin` deployment and config PVC
 
 ## Important Notes
 
@@ -42,7 +42,7 @@ Verify the tarball exists and is non-empty on the workstation before proceeding.
 Scale the Jellyfin deployment to zero replicas to release the config PVC:
 
 ```bash
-kubectl -n jellyfin scale deploy jellyfin-jellyfin --replicas=0
+kubectl -n jellyfin scale deploy jellyfin --replicas=0
 ```
 
 Wait for the pod to be deleted:
@@ -67,7 +67,7 @@ First, identify the config PVC name:
 kubectl -n jellyfin get pvc
 ```
 
-Look for a PVC named something like `jellyfin-jellyfin` or similar. Replace `<CONFIG_PVC>` in the command below with the actual PVC name.
+Look for a PVC named something like `jellyfin` or similar. Replace `<CONFIG_PVC>` in the command below with the actual PVC name.
 
 Launch a busybox helper pod that mounts the config PVC:
 
@@ -123,7 +123,7 @@ kubectl -n jellyfin delete pod jf-seed
 Scale the Jellyfin deployment back to one replica:
 
 ```bash
-kubectl -n jellyfin scale deploy jellyfin-jellyfin --replicas=1
+kubectl -n jellyfin scale deploy jellyfin --replicas=1
 ```
 
 Wait for the Jellyfin pod to be ready:
@@ -152,7 +152,7 @@ Once Jellyfin has started:
 
 If the migration fails:
 
-1. Scale Jellyfin to zero: `kubectl -n jellyfin scale deploy jellyfin-jellyfin --replicas=0`
+1. Scale Jellyfin to zero: `kubectl -n jellyfin scale deploy jellyfin --replicas=0`
 2. Delete the config PVC and recreate it: `kubectl -n jellyfin delete pvc <CONFIG_PVC>`
 3. Restore from the original Dockge container (restart `docker-compose@jellyfin`)
 4. Contact the administrator for assistance before re-attempting the migration
@@ -175,6 +175,6 @@ kubectl -n jellyfin exec jf-seed -- chown -R 1000:1000 /config
 ### Jellyfin pod fails to start
 Check the pod logs for database errors:
 ```bash
-kubectl -n jellyfin logs jellyfin-jellyfin-<pod-id>
+kubectl -n jellyfin logs jellyfin-<pod-id>
 ```
 Verify the config tarball was extracted correctly by re-entering the helper pod before deletion.
