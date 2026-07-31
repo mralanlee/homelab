@@ -312,6 +312,10 @@ Before proceeding to Task 3 (Jellyfin Helm deployment):
 
 ---
 
+## Deploy Notes
+
+On a cold ArgoCD sync, the GpuDevicePlugin CR may briefly show Progressing/Degraded because its admission webhook (failurePolicy: Fail) is not served until the operator Deployment is Ready. This is expected and self-heals on retry — not an error.
+
 ## Notes for Downstream Tasks
 
 - **Task 3 (Jellyfin Helm)**: Use the node label `intel.feature.node.kubernetes.io/gpu=true` in the plugin `nodeSelector`.

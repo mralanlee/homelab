@@ -22,8 +22,10 @@ This runbook documents how to seed the Jellyfin Kubernetes config PVC with the e
 On the Dockge LXC host, package the existing Jellyfin config:
 
 ```bash
-# Stop the Jellyfin container to ensure a clean state
-systemctl stop docker-compose@jellyfin 2>/dev/null || true
+# Stop the Jellyfin compose stack to ensure a clean state
+ssh dockge
+cd /dockge
+docker-compose down jellyfin || true
 
 # Create a gzipped tar of the config directory
 tar -C /apps/jellyfin -czf /tmp/jellyfin-config.tgz config
@@ -153,9 +155,13 @@ Once Jellyfin has started:
 If the migration fails:
 
 1. Scale Jellyfin to zero: `kubectl -n jellyfin scale deploy jellyfin --replicas=0`
-2. Delete the config PVC and recreate it: `kubectl -n jellyfin delete pvc <CONFIG_PVC>`
-3. Restore from the original Dockge container (restart `docker-compose@jellyfin`)
-4. Contact the administrator for assistance before re-attempting the migration
+2. Restore from the original Dockge container:
+   ```bash
+   ssh dockge
+   cd /dockge
+   docker-compose up -d jellyfin
+   ```
+3. Contact the administrator for assistance before re-attempting the migration
 
 ## Troubleshooting
 

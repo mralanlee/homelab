@@ -51,6 +51,7 @@ jellyfin:
     cache:
       enabled: false
     # Disable the single bundled media PVC; we mount 3 NFS shares below.
+    # Note: media.enabled=false still yields an unused /media emptyDir upstream — harmless; real media is the NFS volumes below.
     media:
       enabled: false
 
