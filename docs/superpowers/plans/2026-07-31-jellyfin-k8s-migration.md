@@ -224,7 +224,7 @@ git commit -m "feat(argocd-apps): register intel-device-plugin core app"
 
 **Interfaces:**
 - Consumes: `<RENDER_GID>` (Task 1 Step 3); `truenas-iscsi` StorageClass; `gpu.intel.com/i915` (Task 2); TrueNAS NFS server address `<NFS_SERVER>` and export paths (obtained in Step 2 below).
-- Produces: Deployment `jellyfin-jellyfin` and Service `jellyfin-jellyfin` on port `8096` (consumed by Task 5's HTTPRoute). Helper `jellyfin.labels` template consumed by Task 5.
+- Produces: Deployment `jellyfin` and Service `jellyfin` on port `8096` (the official subchart's fullname helper dedupes because the release name `jellyfin` already contains the chart name `jellyfin`; it is NOT `jellyfin-jellyfin`). Consumed by Task 5's HTTPRoute. Helper `jellyfin.labels` template consumed by Task 5.
 
 - [ ] **Step 1: Write `Chart.yaml`**
 
@@ -388,7 +388,7 @@ git commit -m "feat(jellyfin): add jellyfin chart with iGPU transcoding + NFS me
 - Create: `charts/jellyfin/templates/httproute.yaml`
 
 **Interfaces:**
-- Consumes: `jellyfin.labels` helper (Task 4); Service `jellyfin-jellyfin:8096` (Task 4); `.Values.ingress.*` (Task 4 values).
+- Consumes: `jellyfin.labels` helper (Task 4); Service `jellyfin:8096` (Task 4); `.Values.ingress.*` (Task 4 values).
 - Produces: HTTPRoute routing `jellyfin.k8s.shimmerlabs.xyz` → Jellyfin service.
 
 - [ ] **Step 1: Confirm the rendered Service name and port**
@@ -396,7 +396,7 @@ git commit -m "feat(jellyfin): add jellyfin chart with iGPU transcoding + NFS me
 ```bash
 helm template jellyfin charts/jellyfin -n jellyfin | grep -B2 -A8 'kind: Service'
 ```
-Expected: a Service named `jellyfin-jellyfin` (release name + chart name) exposing port `8096`. Use the exact name observed here as the backend `name` in Step 2 (adjust if the upstream chart names it differently).
+Expected: a Service named `jellyfin` exposing port `8096`. The subchart's fullname helper dedupes (release name `jellyfin` already contains chart name `jellyfin`), so it is `jellyfin`, NOT `jellyfin-jellyfin`. Use the exact name observed here as the backend `name` in Step 2.
 
 - [ ] **Step 2: Write `templates/httproute.yaml`**
 
@@ -422,7 +422,8 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: {{ .Release.Name }}-jellyfin
+        # subchart fullname dedupes to "jellyfin" (release name == chart name)
+        - name: jellyfin
           port: 8096
 ```
 
@@ -431,7 +432,7 @@ spec:
 ```bash
 helm template jellyfin charts/jellyfin -n jellyfin | grep -A18 'kind: HTTPRoute'
 ```
-Expected: HTTPRoute with `hostnames: [jellyfin.k8s.shimmerlabs.xyz]`, parent `homelab`/`gateway`/`https`, and `backendRefs` name `jellyfin-jellyfin` port `8096`. Confirm the backend name matches Step 1.
+Expected: HTTPRoute with `hostnames: [jellyfin.k8s.shimmerlabs.xyz]`, parent `homelab`/`gateway`/`https`, and `backendRefs` name `jellyfin` port `8096`. Confirm the backend name matches Step 1.
 
 - [ ] **Step 4: Commit**
 
@@ -465,7 +466,7 @@ Copy `/tmp/jellyfin-config.tgz` to the workstation that runs `kubectl` (e.g. `sc
 - [ ] **Step 2: Scale Jellyfin to zero so the PVC is free**
 
 ```bash
-kubectl -n jellyfin scale deploy jellyfin-jellyfin --replicas=0
+kubectl -n jellyfin scale deploy jellyfin --replicas=0
 kubectl -n jellyfin wait --for=delete pod -l app.kubernetes.io/name=jellyfin --timeout=120s
 ```
 
@@ -492,7 +493,7 @@ Expected: the extracted config (e.g. `data/`, `config/`, `*.db`) is listed under
 
 ```bash
 kubectl -n jellyfin delete pod jf-seed
-kubectl -n jellyfin scale deploy jellyfin-jellyfin --replicas=1
+kubectl -n jellyfin scale deploy jellyfin --replicas=1
 ```
 
 - [ ] **Step 6: Commit the runbook**
@@ -526,7 +527,7 @@ Via ArgoCD (add a leaf Application) or directly:
 ```bash
 helm dependency update charts/jellyfin
 helm upgrade --install jellyfin charts/jellyfin -n jellyfin --create-namespace
-kubectl -n jellyfin rollout status deploy/jellyfin-jellyfin --timeout=300s
+kubectl -n jellyfin rollout status deploy/jellyfin --timeout=300s
 ```
 Expected: rollout completes; the pod is scheduled on `k8s-w-2`.
 
@@ -535,7 +536,7 @@ Expected: rollout completes; the pod is scheduled on `k8s-w-2`.
 Execute `docs/runbooks/jellyfin-config-migration.md` (Task 6 Steps 1–5). After scaling back up, wait for the pod:
 
 ```bash
-kubectl -n jellyfin rollout status deploy/jellyfin-jellyfin --timeout=300s
+kubectl -n jellyfin rollout status deploy/jellyfin --timeout=300s
 ```
 
 - [ ] **Step 4: Verify the HTTPRoute is accepted and the UI loads**
@@ -551,7 +552,7 @@ Expected: HTTPRoute Accepted `True`; health endpoint returns `200`. The UI shows
 In the Jellyfin web UI → Dashboard → check that VAAPI is available (Playback settings show the `/dev/dri/renderD128` device). Play a title that forces a transcode, then:
 
 ```bash
-kubectl -n jellyfin exec deploy/jellyfin-jellyfin -- sh -c 'ls -l /dev/dri && (ps -ef | grep -i ffmpeg | grep -i vaapi || echo "no vaapi ffmpeg yet")'
+kubectl -n jellyfin exec deploy/jellyfin -- sh -c 'ls -l /dev/dri && (ps -ef | grep -i ffmpeg | grep -i vaapi || echo "no vaapi ffmpeg yet")'
 ```
 Expected: `/dev/dri/renderD128` visible in the pod; during a transcode the dashboard "Playback" panel reports hardware (VAAPI) transcoding.
 
@@ -576,4 +577,4 @@ Expected: `/dev/dri/renderD128` visible in the pod; during a transcode the dashb
 
 **Placeholder scan:** The only `<...>` tokens (`<RENDER_GID>`, `<NFS_SERVER>`, export paths, `<VMID>`, `<CONFIG_PVC>`, `<DOCKGE_CTID>`) are real environment values the operator must supply; each has an explicit step showing how to obtain it. No "TBD"/"handle edge cases"/vague steps.
 
-**Type/name consistency:** Service/Deployment name `jellyfin-jellyfin` used consistently in Tasks 4, 5, 6, 7; HTTPRoute backend `{{ .Release.Name }}-jellyfin` = `jellyfin-jellyfin` (Task 5 Step 1 verifies). Node label `intel.feature.node.kubernetes.io/gpu=true` matches between Task 1 Step 4 and Task 2 plugin `nodeSelector`. `<RENDER_GID>` flows Task 1 → Task 4.
+**Type/name consistency:** Service/Deployment name `jellyfin` used consistently in Tasks 4, 5, 6, 7 — the official subchart's fullname helper dedupes because the release name `jellyfin` already contains the chart name `jellyfin`, so it is `jellyfin`, NOT `jellyfin-jellyfin` (Task 5 Step 1 verifies against the render). Node label `intel.feature.node.kubernetes.io/gpu=true` matches between Task 1 Step 4 and Task 2 plugin `nodeSelector`. `<RENDER_GID>` flows Task 1 → Task 4.
