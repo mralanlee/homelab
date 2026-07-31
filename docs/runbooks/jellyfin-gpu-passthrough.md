@@ -16,7 +16,41 @@ Passthrough moves the iGPU from the Dockge LXC to the k8s-w-2 VM. Once complete,
 
 ## Risk
 
-VFIO passthrough is a host-level operation. The iGPU will be **dedicated exclusively to k8s-w-2** once attached. The Proxmox host and other guests will lose access to the GPU. Revert all steps (in reverse order) to restore access.
+VFIO passthrough is a host-level operation with the following implications:
+
+### GPU Dedication
+The iGPU will be **dedicated exclusively to k8s-w-2** once attached. The Proxmox host kernel and other guests (including Dockge) will lose direct access to the GPU device. Revert all steps (in reverse order) to restore access.
+
+### IOMMU Grouping
+VFIO passthrough binds not just the iGPU, but all PCI devices sharing its IOMMU group. Before proceeding, verify that the iGPU is in an isolated IOMMU group (ideally containing only the GPU device):
+
+```bash
+# On pve1, identify the iGPU IOMMU group
+lspci -nn | grep -Ei 'VGA|Display'  # Note the PCI address, e.g., 00:02.0
+
+# Check its IOMMU group (replace 00:02.0 with the actual address)
+find /sys/kernel/iommu_groups/ -type l | grep '00:02\.0'
+```
+
+Expected output (example):
+
+```
+/sys/kernel/iommu_groups/0/devices/0000:00:02.0
+```
+
+Verify that the iGPU's group directory (e.g., `/sys/kernel/iommu_groups/0/devices/`) contains only the GPU device:
+
+```bash
+ls -la /sys/kernel/iommu_groups/0/devices/
+```
+
+If the group contains other devices (chipset, network, storage), those will also be passed through. Document which devices are grouped and confirm that losing them to k8s-w-2 is acceptable.
+
+### Host Framebuffer / Headless
+**Proxmox host `pve1` is headless** (no physical display attached). Once the iGPU is VFIO-bound, it is no longer available to the host kernel, but this causes no host display loss since pve1 does not render a display. The iGPU simply becomes unavailable for video output on the host and can only be used inside the k8s-w-2 VM.
+
+### Rollback
+To restore the iGPU to the Proxmox host and Dockge LXC, follow the rollback steps in each procedure section (Steps 1–4). Rollback must be done in reverse order.
 
 ---
 
