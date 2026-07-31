@@ -1,0 +1,88 @@
+# Wraps the official jellyfin/jellyfin chart. Upstream Ingress is disabled;
+# ingress is a Gateway API HTTPRoute in templates/httproute.yaml.
+jellyfin:
+  enabled: true
+
+  image:
+    tag: "10.11.11"
+
+  # GPU: request one Intel i915 device. The scheduler auto-places the pod on the
+  # node advertising gpu.intel.com/i915 (k8s-w-2), so no workload nodeSelector is needed.
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: "4"
+      memory: 4Gi
+      gpu.intel.com/i915: 1
+
+  # user 1000:1000 + supplemental groups: 44 (video), 104 (render).
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    supplementalGroups:
+      - 44
+      # verify against: stat -c '%g' /dev/dri/renderD128 on k8s-w-2 (compose used 104)
+      - 104
+
+  service:
+    port: 8096
+
+  # We use a custom HTTPRoute, not the chart Ingress.
+  ingress:
+    enabled: false
+
+  jellyfin:
+    enableDLNA: false
+    env:
+      - name: JELLYFIN_PublishedServerUrl
+        value: https://jellyfin.k8s.shimmerlabs.xyz
+
+  persistence:
+    # Config on iSCSI (RWO); node-pinned by the GPU anyway. Seeded in Task 6.
+    config:
+      enabled: true
+      storageClass: truenas-iscsi
+      accessMode: ReadWriteOnce
+      size: 10Gi
+    # Cache is ephemeral -> emptyDir (regenerates). Disable the bundled PVC.
+    cache:
+      enabled: false
+    # Disable the single bundled media PVC; we mount 3 NFS shares below.
+    media:
+      enabled: false
+
+  # REQUIRED before deploy: replace <NFS_SERVER> and the three <EXPORT_*> paths
+  # with the real TrueNAS NFS server + export paths (see docs/runbooks / plan Task 4 Step 2).
+  # Direct NFS mounts to the existing TrueNAS exports (no reprovisioning).
+  volumes:
+    - name: movies
+      nfs:
+        server: <NFS_SERVER>
+        path: <EXPORT_MOVIES>
+    - name: series
+      nfs:
+        server: <NFS_SERVER>
+        path: <EXPORT_SERIES>
+        readOnly: true
+    - name: private
+      nfs:
+        server: <NFS_SERVER>
+        path: <EXPORT_PRIVATE>
+  volumeMounts:
+    - name: movies
+      mountPath: /movies
+    - name: series
+      mountPath: /series
+      readOnly: true
+    - name: private
+      mountPath: /private
+
+# Ingress values consumed by templates/httproute.yaml (Task 5).
+ingress:
+  hostname: jellyfin.k8s.shimmerlabs.xyz
+  gatewayName: homelab
+  gatewayNamespace: gateway
+  gatewaySectionName: https
