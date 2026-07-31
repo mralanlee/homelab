@@ -70,6 +70,14 @@ apps:
     namespace: grafana
     path: charts/grafana
 
+  # Wave 0: Intel GPU device plugin — advertises gpu.intel.com/i915 on k8s-w-2.
+  # serverSideApply: operator ships CRDs (GpuDevicePlugin) that exceed the
+  # client-side last-applied annotation limit.
+  - name: intel-device-plugin
+    namespace: intel-device-plugin
+    path: charts/intel-device-plugin
+    serverSideApply: true
+
   # Wave 10: ArgoCD self-management. Depends on cert-manager (server cert),
   # external-secrets (dex + repo creds), and gateway (HTTPRoute) — all wave 0.
   # ServerSideApply required: argo-cd CRDs (Application/ApplicationSet/AppProject)
