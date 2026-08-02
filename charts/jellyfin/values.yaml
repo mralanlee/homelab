@@ -55,23 +55,24 @@ jellyfin:
     media:
       enabled: false
 
-  # REQUIRED before deploy: replace <NFS_SERVER> and the three <EXPORT_*> paths
-  # with the real TrueNAS NFS server + export paths (see docs/runbooks / plan Task 4 Step 2).
-  # Direct NFS mounts to the existing TrueNAS exports (no reprovisioning).
+  # Direct NFS mounts to the existing TrueNAS media export (no reprovisioning).
+  # Single export 10.22.2.2:/mnt/storage/media; movies/series/private are subdirs
+  # mounted individually. TrueNAS: add the k8s node IPs to this export's allowed
+  # networks, else the pod mount is denied. Media is already owned by uid 1000.
   volumes:
     - name: movies
       nfs:
-        server: <NFS_SERVER>
-        path: <EXPORT_MOVIES>
+        server: 10.22.2.2
+        path: /mnt/storage/media/movies
     - name: series
       nfs:
-        server: <NFS_SERVER>
-        path: <EXPORT_SERIES>
+        server: 10.22.2.2
+        path: /mnt/storage/media/series
         readOnly: true
     - name: private
       nfs:
-        server: <NFS_SERVER>
-        path: <EXPORT_PRIVATE>
+        server: 10.22.2.2
+        path: /mnt/storage/media/private
   volumeMounts:
     - name: movies
       mountPath: /movies
