@@ -3,6 +3,7 @@ kind: ExternalSecret
 metadata:
   name: argocd-repo-lace
 spec:
+  refreshInterval: 21h
   secretStoreRef:
     kind: ClusterSecretStore
     name: onepassword-sdk
