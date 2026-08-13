@@ -7,13 +7,13 @@ previewTunnel:
   replicaCount: 2
   # Tunnel "preview" — created with `cloudflared tunnel create preview`.
   # Separate from the lace tunnel on purpose: its remote (dashboard-managed)
-  # ingress rules stay untouched, so lace/lace-hooks can never be shadowed by
-  # the wildcard. DNS does the routing: explicit CNAMEs (lace-hooks, ...) beat
-  # the wildcard CNAME `*` that points here.
+  # ingress rules stay untouched. Previews ride their own zone (glyphix.ai,
+  # proxied wildcard CNAME `*` -> this tunnel), keeping shimmerlabs.xyz free
+  # of apex wildcards (see LEARNINGS.md).
   tunnelId: "ff3551dd-95a0-48ac-a2c1-3ea48a7519de"
   # Ordered ingress rules; a http_status:404 catch-all is always appended.
   ingress:
-    - hostname: "*.shimmerlabs.xyz"
+    - hostname: "*.glyphix.ai"
       service: http://cilium-gateway-preview.gateway.svc.cluster.local:80
   # Secret holding the tunnel credentials file (key: credentials.json).
   credentialsSecretName: preview-tunnel-credentials

@@ -9,10 +9,11 @@ gateway:
 
 # PR-preview gateway: HTTP-only (TLS terminates at the Cloudflare edge; traffic
 # arrives via the preview-tunnel cloudflared connector, not the LB IP). Routes
-# may only attach from namespaces labeled preview=true.
+# may only attach from namespaces labeled preview=true. Previews live on their
+# own zone (glyphix.ai) so the homelab zone never carries an apex wildcard.
 preview:
   name: preview
-  hostname: "*.shimmerlabs.xyz"
+  hostname: "*.glyphix.ai"
   loadBalancerIP: 10.22.6.11
   routeNamespaceLabels:
     preview: "true"

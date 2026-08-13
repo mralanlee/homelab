@@ -1,6 +1,6 @@
 previewSmoke:
   namespace: preview-smoke
-  hostname: smoke-preview.shimmerlabs.xyz
+  hostname: smoke-preview.glyphix.ai
   image:
     repository: nginx
     tag: "1.27-alpine"

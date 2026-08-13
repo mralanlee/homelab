@@ -42,7 +42,7 @@ apps:
     namespace: gateway
     path: charts/gateway
 
-  # cloudflared connector for *.shimmerlabs.xyz PR previews. Depends on the
+  # cloudflared connector for *.glyphix.ai PR previews. Depends on the
   # manually-created preview-tunnel-credentials Secret (see chart values).
   - name: preview-tunnel
     namespace: gateway
