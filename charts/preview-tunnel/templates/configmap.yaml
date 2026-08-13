@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: preview-tunnel
+  labels:
+    app: preview-tunnel
+data:
+  config.yaml: |
+    tunnel: {{ .Values.previewTunnel.tunnelId }}
+    credentials-file: /etc/cloudflared/creds/credentials.json
+    metrics: 0.0.0.0:2000
+    no-autoupdate: true
+    ingress:
+    {{- range .Values.previewTunnel.ingress }}
+      - hostname: {{ .hostname | quote }}
+        service: {{ .service }}
+    {{- end }}
+      - service: http_status:404

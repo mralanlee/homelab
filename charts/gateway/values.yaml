@@ -6,3 +6,13 @@ gateway:
   tlsSecretName: homelab-wildcard-tls
   clusterIssuer: letsencrypt-prod
   loadBalancerIP: 10.22.6.10
+
+# PR-preview gateway: HTTP-only (TLS terminates at the Cloudflare edge; traffic
+# arrives via the preview-tunnel cloudflared connector, not the LB IP). Routes
+# may only attach from namespaces labeled preview=true.
+preview:
+  name: preview
+  hostname: "*.shimmerlabs.xyz"
+  loadBalancerIP: 10.22.6.11
+  routeNamespaceLabels:
+    preview: "true"

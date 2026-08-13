@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: preview-tunnel
+  labels:
+    app: preview-tunnel
+spec:
+  replicas: {{ .Values.previewTunnel.replicaCount }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: preview-tunnel
+  template:
+    metadata:
+      labels:
+        app: preview-tunnel
+      annotations:
+        reloader.stakater.com/auto: "true"
+    spec:
+      containers:
+        - name: cloudflared
+          image: "{{ .Values.previewTunnel.image.repository }}:{{ .Values.previewTunnel.image.tag }}"
+          args:
+            - tunnel
+            - --config
+            - /etc/cloudflared/config.yaml
+            - run
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 2000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.previewTunnel.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/cloudflared/config.yaml
+              subPath: config.yaml
+              readOnly: true
+            - name: creds
+              mountPath: /etc/cloudflared/creds
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: preview-tunnel
+        - name: creds
+          secret:
+            secretName: {{ .Values.previewTunnel.credentialsSecretName }}

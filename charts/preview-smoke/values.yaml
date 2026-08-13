@@ -1,0 +1,6 @@
+previewSmoke:
+  namespace: preview-smoke
+  hostname: smoke-preview.shimmerlabs.xyz
+  image:
+    repository: nginx
+    tag: "1.27-alpine"
