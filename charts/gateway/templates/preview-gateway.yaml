@@ -1,0 +1,21 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ .Values.preview.name }}
+  namespace: {{ .Values.gateway.namespace }}
+  annotations:
+    io.cilium/lb-ipam-ips: {{ .Values.preview.loadBalancerIP | quote }}
+spec:
+  gatewayClassName: {{ .Values.gateway.className }}
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: "{{ .Values.preview.hostname }}"
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              {{- toYaml .Values.preview.routeNamespaceLabels | nindent 14 }}

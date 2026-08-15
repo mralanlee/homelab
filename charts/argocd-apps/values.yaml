@@ -42,6 +42,12 @@ apps:
     namespace: gateway
     path: charts/gateway
 
+  # cloudflared connector for *.glyphix.ai PR previews. Depends on the
+  # manually-created preview-tunnel-credentials Secret (see chart values).
+  - name: preview-tunnel
+    namespace: gateway
+    path: charts/preview-tunnel
+
   - name: bind9
     namespace: bind9
     path: charts/bind9

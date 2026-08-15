@@ -69,6 +69,11 @@ Bake into Ansible common role.
 **Fix:** Remove apex wildcard `*.shimmerlabs.xyz`. Use specific subdomain wildcards (`*.k8s`, `*.int`).
 **Why:** With `ndots:5`, pod resolver tries `name.<search-domain>` before bare `name`. If wildcard catches it, you get hijacked traffic. **Don't use root-domain wildcards in homelab DNS** unless you've stripped search domains.
 
+### kubelet reads a different resolv.conf per node — search-domain fixes must cover both
+**Problem:** Stripping `search shimmerlabs.xyz` from `/etc/resolv.conf` on all nodes didn't clean new pods' resolv.conf on workers (prerequisite for re-adding the apex wildcard `*` → preview tunnel).
+**Fix:** Workers' kubelet has `resolvConf: /run/systemd/resolve/resolv.conf`; the domain came from DHCPv4 on eth0. Added `[DHCPv4] UseDomains=no` to the networkd drop-in (old one only covered DHCPv6/RA), `resolvectl domain eth0 ""` for the running state, then rolling-restarted egress workloads — pods keep the search list they were created with.
+**Why:** cp-1 kubelet reads the static `/etc/resolv.conf`; workers read systemd-resolved's generated file, which mirrors per-link domains, not the static file. With search domains stripped everywhere, the proxied apex wildcard (PR previews) no longer hijacks pod egress — verified `getent hosts github.com` from a fresh pod returns real IPs.
+
 ### Cilium hairpin works; MetalLB hairpin doesn't
 **Problem:** Pod connecting to LoadBalancer IP got "operation not permitted" with MetalLB. Hardcoded hostAliases needed for OIDC discovery.
 **Fix:** Switched to Cilium L2 Announcements. Pod-to-LoadBalancer-to-pod hairpin works natively.

@@ -142,10 +142,13 @@
     mode: "0755"
   when: ansible_virtualization_type != "lxc"
 
-- name: Disable DHCPv6/RA search domain inheritance
+- name: Disable DHCP/RA search domain inheritance
   ansible.builtin.copy:
     dest: /etc/systemd/network/10-netplan-eth0.network.d/no-domains.conf
     content: |
+      [DHCPv4]
+      UseDomains=no
+
       [DHCPv6]
       UseDomains=no
 
@@ -159,6 +162,17 @@
   ansible.builtin.command: networkctl reload
   when: networkd_dropin.changed
   changed_when: true
+
+# Pods inherit the node's resolv.conf search list. With ndots:5, a
+# `search shimmerlabs.xyz` entry makes pods try `<name>.shimmerlabs.xyz` for
+# every external lookup — and the proxied wildcard `*.shimmerlabs.xyz`
+# (PR previews) would answer all of them with Cloudflare edge IPs,
+# hijacking pod egress (see LEARNINGS.md: wildcard DNS at apex).
+- name: Strip homelab search domain from resolv.conf
+  ansible.builtin.lineinfile:
+    path: /etc/resolv.conf
+    regexp: '^search\s+.*shimmerlabs\.xyz'
+    state: absent
 
 # LXC: kubelet must not fail on swap (host swap visible in container)
 - name: Create kubelet systemd drop-in dir
