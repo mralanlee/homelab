@@ -17,12 +17,10 @@ previewTunnel:
       service: http://cilium-gateway-preview.gateway.svc.cluster.local:80
   # Secret holding the tunnel credentials file (key: credentials.json).
   credentialsSecretName: preview-tunnel-credentials
-  # Sync credentials.json from 1Password via ESO. Until the 1Password item
-  # exists, keep disabled and create the Secret by hand:
-  #   kubectl -n gateway create secret generic preview-tunnel-credentials \
-  #     --from-file=credentials.json=$HOME/.cloudflared/<tunnel-id>.json
+  # Sync credentials.json from 1Password via ESO (item preview-tunnel-creds,
+  # field credential, vault shimmer-labs).
   externalSecret:
-    enabled: false
+    enabled: true
     store: onepassword-sdk
     remoteRef: "preview-tunnel-creds/credential"
   resources:
