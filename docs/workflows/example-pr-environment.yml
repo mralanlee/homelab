@@ -1,0 +1,30 @@
+# Example workflow showing how to use the reusable PR environment comment workflow
+# This file is for documentation purposes - copy to your repo's .github/workflows/
+# and customize the namespace/repo values
+
+name: PR Environment (Example)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # Your deployment job that actually creates the PR environment
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Deploy PR environment
+  #       run: |
+  #         # Your deployment logic here
+  #         echo "Deploying to Kubernetes..."
+
+  # Call the reusable workflow to comment on the PR
+  notify:
+    # Uncomment if you have a deploy job:
+    # needs: deploy
+    uses: mralanlee/homelab/.github/workflows/pr-environment-comment.yml@main
+    with:
+      namespace: mralanlee  # Your GitHub username or org
+      repo: lace            # Your repository name
+    permissions:
+      pull-requests: write
