@@ -1,0 +1,73 @@
+# Reusable workflow for commenting on PRs with their preview environment URL
+# 
+# Copy this file to .github/workflows/ in your repository to use it.
+# See docs/workflows/example-pr-environment.yml for usage example.
+#
+# Part of the homelab PR environment system - see docs/pr-environments.md
+
+name: PR Environment Comment
+
+on:
+  workflow_call:
+    inputs:
+      namespace:
+        description: 'Kubernetes namespace (usually GitHub org/user)'
+        required: true
+        type: string
+      repo:
+        description: 'Repository name'
+        required: true
+        type: string
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment PR with environment URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const namespace = '${{ inputs.namespace }}';
+            const repo = '${{ inputs.repo }}';
+            const url = `https://${namespace}-${repo}-pr-${prNumber}.glyphix.ai`;
+            
+            // Check if we've already commented
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('PR environment deployed')
+            );
+            
+            const body = `## 🚀 PR environment deployed
+
+Your preview environment is available at:
+
+**${url}**
+
+This environment will be automatically updated with each push to this PR.`;
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body
+              });
+            }

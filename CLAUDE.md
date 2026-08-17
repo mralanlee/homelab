@@ -61,6 +61,15 @@ No Makefile, Taskfile, or CI/CD pipelines exist. Deploys are manual via `helm` o
 ### Workflow Automation
 - n8n with Redis cache and PostgreSQL backend, worker autoscaling enabled
 
+### PR Environments
+- **Preview Gateway**: Dedicated Gateway API gateway for PR preview traffic
+- **Domain**: `*.glyphix.ai` (separate from main `k8s.shimmerlabs.xyz` zone)
+- **URL Pattern**: `<namespace>-<repo>-pr-<number>.glyphix.ai`
+- **Cloudflare Tunnel**: `preview-tunnel` chart routes traffic to preview gateway
+- **Requirements**: Namespaces must have label `preview: "true"` to attach HTTPRoutes
+- **GitHub Integration**: Reusable workflow in `.github/workflows/pr-environment-comment.yml` for automatic PR comments
+- See `docs/pr-environments.md` for full details
+
 ## Key Patterns
 
 - Each chart has `Chart.yaml` (with dependency), `Chart.lock`, `values.yaml`, and optionally `templates/` for custom resources (ClusterIssuers, IPPools, ExternalSecrets, PostgreSQL clusters, etc.)
