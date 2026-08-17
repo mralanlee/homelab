@@ -1,0 +1,45 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: grafana-pg
+  namespace: grafana
+spec:
+  description: "PostgreSQL Cluster for grafana"
+  imageName: ghcr.io/cloudnative-pg/postgresql:18
+  instances: 1
+  storage:
+    size: {{ .Values.postgres.storageSize | default "5Gi" }}
+    storageClass: {{ .Values.postgres.storageClass | default "truenas-iscsi" }}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  postgresql:
+    parameters:
+      shared_buffers: 256MB
+      max_connections: "100"
+  managed:
+    roles:
+      - name: grafana
+        inherit: true
+        connectionLimit: -1
+        ensure: present
+        superuser: false
+        login: true
+        passwordSecret:
+          name: grafana-db-auth
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: grafana
+  namespace: grafana
+spec:
+  name: grafana
+  owner: grafana
+  cluster:
+    name: grafana-pg

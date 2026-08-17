@@ -1,3 +1,8 @@
+# CloudNativePG cluster for Grafana's backing DB (templates/pg.yaml).
+postgres:
+  storageSize: 5Gi
+  storageClass: truenas-iscsi
+
 grafana:
   replicas: 1
 
@@ -8,15 +13,26 @@ grafana:
     type: ClusterIP
     port: 80
 
+  # Backing store is Postgres (cn-pg), so no local persistence needed.
+  # Dashboards/datasources are provisioned via GitOps and survive pod loss.
   persistence:
-    enabled: true
-    type: sts
-    storageClassName: truenas-iscsi
-    accessModes:
-      - ReadWriteOnce
-    size: 10Gi
-    finalizers:
-      - kubernetes.io/pvc-protection
+    enabled: false
+
+  # Use the cn-pg Postgres cluster instead of the default on-disk sqlite.
+  # Password injected via GF_DATABASE_PASSWORD (envValueFrom below).
+  grafana.ini:
+    database:
+      type: postgres
+      host: grafana-pg-rw:5432
+      name: grafana
+      user: grafana
+      ssl_mode: disable
+
+  envValueFrom:
+    GF_DATABASE_PASSWORD:
+      secretKeyRef:
+        name: grafana-db-auth
+        key: password
 
   ingress:
     # Disabled — using Cilium Gateway API HTTPRoute (templates/httproute.yaml)
