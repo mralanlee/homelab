@@ -10,6 +10,15 @@ democratic-csi:
       allowVolumeExpansion: true
       parameters:
         fsType: ext4
+    # Same backend, but deleting the claim keeps the volume: for data that can't be
+    # re-created (bmy research experiment log, results, reports).
+    - name: truenas-iscsi-retain
+      defaultClass: false
+      reclaimPolicy: Retain
+      volumeBindingMode: Immediate
+      allowVolumeExpansion: true
+      parameters:
+        fsType: ext4
   
   driver:
     existingConfigSecret: truenas-iscsi-config
