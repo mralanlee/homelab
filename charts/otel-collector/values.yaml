@@ -54,6 +54,9 @@ opentelemetry-collector:
         exclude:
           # The preset's own exclusion (a list here replaces it).
           - /var/log/pods/otel-collector_otel-collector*_*/opentelemetry-collector/*.log
+          # OpenObserve logs every ingest request: shipping that log back to
+          # it is a loop (a line per batch, which makes the next batch).
+          - /var/log/pods/openobserve_*/*/*.log
           # lace's control plane exports its own structured logs over OTLP
           # (mralanlee/lace telemetry/); tailing them too would double them.
           - /var/log/pods/lace_*/control-plane/*.log
