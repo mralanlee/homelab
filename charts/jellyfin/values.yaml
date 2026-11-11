@@ -1,0 +1,90 @@
+# Wraps the official jellyfin/jellyfin chart. Upstream Ingress is disabled;
+# ingress is a Gateway API HTTPRoute in templates/httproute.yaml.
+jellyfin:
+  enabled: true
+
+  image:
+    tag: "10.11.11"
+
+  # GPU: request one Intel i915 device. The scheduler auto-places the pod on the
+  # node advertising gpu.intel.com/i915 (k8s-w-2), so no workload nodeSelector is needed.
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: "4"
+      memory: 4Gi
+      gpu.intel.com/i915: 1
+
+  # user 1000:1000 + supplemental groups: 44 (video), 104 (render).
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    supplementalGroups:
+      - 44
+      # verify against: stat -c '%g' /dev/dri/renderD128 on k8s-w-2 (compose used 104)
+      - 104
+
+  service:
+    port: 8096
+
+  # We use a custom HTTPRoute, not the chart Ingress.
+  ingress:
+    enabled: false
+
+  jellyfin:
+    enableDLNA: false
+    env:
+      - name: JELLYFIN_PublishedServerUrl
+        value: https://jellyfin.k8s.shimmerlabs.xyz
+
+  persistence:
+    # Config on iSCSI (RWO); node-pinned by the GPU anyway. Seeded in Task 6.
+    config:
+      enabled: true
+      storageClass: truenas-iscsi
+      accessMode: ReadWriteOnce
+      size: 10Gi
+    # Cache is ephemeral -> emptyDir (regenerates). Disable the bundled PVC.
+    cache:
+      enabled: false
+    # Disable the single bundled media PVC; we mount 3 NFS shares below.
+    # Note: media.enabled=false still yields an unused /media emptyDir upstream — harmless; real media is the NFS volumes below.
+    media:
+      enabled: false
+
+  # Direct NFS mounts to the existing TrueNAS media export (no reprovisioning).
+  # Single export 10.22.2.2:/mnt/storage/media; movies/series/private are subdirs
+  # mounted individually. TrueNAS: add the k8s node IPs to this export's allowed
+  # networks, else the pod mount is denied. Media is already owned by uid 1000.
+  volumes:
+    - name: movies
+      nfs:
+        server: 10.22.2.2
+        path: /mnt/storage/media/movies
+    - name: series
+      nfs:
+        server: 10.22.2.2
+        path: /mnt/storage/media/series
+        readOnly: true
+    - name: private
+      nfs:
+        server: 10.22.2.2
+        path: /mnt/storage/media/private
+  volumeMounts:
+    - name: movies
+      mountPath: /movies
+    - name: series
+      mountPath: /series
+      readOnly: true
+    - name: private
+      mountPath: /private
+
+# Ingress values consumed by templates/httproute.yaml (Task 5).
+ingress:
+  hostname: jellyfin.k8s.shimmerlabs.xyz
+  gatewayName: homelab
+  gatewayNamespace: gateway
+  gatewaySectionName: https

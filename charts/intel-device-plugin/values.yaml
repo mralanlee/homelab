@@ -1,0 +1,18 @@
+# Operator installs the GpuDevicePlugin CRD + controller.
+intel-device-plugins-operator:
+  # Intel operator admission webhook is served with a cert-manager Certificate;
+  # cluster already runs cert-manager (wave 0).
+  manager:
+    devices:
+      gpu: true
+
+# GpuDevicePlugin CR: single known GPU node, so skip NFD and pin by label.
+intel-device-plugins-gpu:
+  enabled: true
+  name: gpudeviceplugin
+  # sharedDevNum=1 => one pod may claim the iGPU at a time (single Jellyfin consumer).
+  sharedDevNum: 1
+  # No Node Feature Discovery in this cluster; we hand-label the node in Task 1.
+  nodeFeatureRule: false
+  nodeSelector:
+    intel.feature.node.kubernetes.io/gpu: 'true'
