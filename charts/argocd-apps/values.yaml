@@ -72,10 +72,6 @@ apps:
     namespace: kube-system
     path: charts/metrics-server
 
-  - name: grafana
-    namespace: grafana
-    path: charts/grafana
-
   # Wave 10: ArgoCD self-management. Depends on cert-manager (server cert),
   # external-secrets (dex + repo creds), and gateway (HTTPRoute) — all wave 0.
   # ServerSideApply required: argo-cd CRDs (Application/ApplicationSet/AppProject)
@@ -85,12 +81,6 @@ apps:
     path: charts/argocd
     syncWave: 10
     serverSideApply: true
-
-  # Wave 10: custom Grafana dashboards — needs grafana (sidecar) healthy first
-  - name: homelab-dashboards
-    namespace: grafana
-    path: charts/homelab-dashboards
-    syncWave: 10
 
   # Wave 10: depends on cn-pg + cert-manager + external-secrets
   - name: authentik

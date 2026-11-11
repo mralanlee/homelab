@@ -55,7 +55,7 @@ No Makefile, Taskfile, or CI/CD pipelines exist. Deploys are manual via `helm` o
 
 ### Monitoring
 - kube-prometheus-stack (Prometheus 15d retention/50Gi, AlertManager 10Gi)
-- Standalone Grafana chart (Grafana disabled in kube-prometheus-stack)
+- No dashboard UI: Grafana removed (bundled Grafana in kube-prometheus-stack stays disabled)
 - ServiceMonitor discovery label: `release: kube-prometheus-stack`
 
 ### Workflow Automation
