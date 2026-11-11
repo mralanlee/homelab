@@ -100,3 +100,11 @@ apps:
           - /spec/storage
         managedFieldsManagers:
           - cnpg-controller-manager
+
+  # Wave 10: logs/metrics/traces backend. Depends on democratic-csi (PVC),
+  # external-secrets (root creds), gateway (HTTPRoute), and
+  # prometheus-operator-crds (ServiceMonitor).
+  - name: openobserve
+    namespace: openobserve
+    path: charts/openobserve
+    syncWave: 10

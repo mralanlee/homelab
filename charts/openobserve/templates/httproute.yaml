@@ -1,0 +1,28 @@
+# Labels are inlined instead of a shared "openobserve.labels" helper: the
+# openobserve-standalone subchart already defines that helper name and Helm
+# template names are global across the chart tree.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: openobserve
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: openobserve
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  parentRefs:
+    - name: {{ .Values.ingress.gatewayName | default "homelab" }}
+      namespace: {{ .Values.ingress.gatewayNamespace | default "gateway" }}
+      sectionName: {{ .Values.ingress.gatewaySectionName | default "https" }}
+  hostnames:
+    - {{ .Values.ingress.hostname }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        # Service named by fullnameOverride in values.yaml.
+        - name: openobserve
+          port: 5080
