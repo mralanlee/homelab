@@ -28,6 +28,8 @@ secret values from that log at the source (mralanlee/lace `harness/shared/redact
 `alternateConfig.receivers.file_log.exclude` in `values.yaml`:
 
 - the agent's own log
+- OpenObserve's own pods: it logs every ingest request, so shipping that log
+  back to it loops (seen: ~3,000 lines a minute)
 - lace's `control-plane` container, which exports its own structured logs over
   OTLP; tailing it too would store every line twice
 
