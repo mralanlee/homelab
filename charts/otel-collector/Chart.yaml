@@ -8,3 +8,9 @@ dependencies:
   - name: opentelemetry-collector
     version: 0.178.3
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+  # Same chart again as a single-replica Deployment: cluster-wide receivers
+  # (k8s_cluster, k8s events) must run once, not once per node.
+  - name: opentelemetry-collector
+    alias: otel-cluster
+    version: 0.178.3
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts

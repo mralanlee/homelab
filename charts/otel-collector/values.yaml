@@ -19,6 +19,14 @@ opentelemetry-collector:
     # k8s.namespace.name, k8s.pod.name, k8s.job.name, … on every record.
     kubernetesAttributes:
       enabled: true
+    # kubeletstats: CPU/memory/network/fs per node, pod and container.
+    kubeletMetrics:
+      enabled: true
+    # hostmetrics: node CPU, load, memory, disk, network. Hardened: mounts only
+    # /proc and /sys (no host root); filesystem usage comes from kubeletstats.
+    hostMetrics:
+      enabled: true
+      hardenedMode: true
 
   # OPENOBSERVE_AUTH, built by ESO (templates/openobserve-auth.yaml).
   extraEnvsFrom:
@@ -50,6 +58,11 @@ opentelemetry-collector:
       health_check:
         endpoint: ${env:MY_POD_IP}:13133
     receivers:
+      # Merged with the preset's kubeletstats. The kubelet serves a self-signed
+      # cert the ServiceAccount CA does not cover, so verification is skipped
+      # (in-cluster, node IP, token-authenticated).
+      kubeletstats:
+        insecure_skip_verify: true
       file_log:
         exclude:
           # The preset's own exclusion (a list here replaces it).
@@ -68,7 +81,7 @@ opentelemetry-collector:
       batch: {}
     exporters:
       otlp_http/openobserve:
-        # Org "default"; the exporter appends /v1/logs.
+        # Org "default"; the exporter appends /v1/logs and /v1/metrics.
         endpoint: http://openobserve.openobserve:5080/api/default
         headers:
           Authorization: ${env:OPENOBSERVE_AUTH}
@@ -86,6 +99,97 @@ opentelemetry-collector:
             - batch
           exporters:
             - otlp_http/openobserve
+        # Receivers (kubeletstats, hostmetrics) come from the presets.
+        metrics:
+          processors:
+            - memory_limiter
+            - batch
+          exporters:
+            - otlp_http/openobserve
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+
+# Single-replica collector for what must not be collected per node: cluster
+# state (deployments, pod phase, restarts, quotas) and Kubernetes events.
+otel-cluster:
+  fullnameOverride: otel-collector-cluster
+  mode: deployment
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s
+
+  presets:
+    clusterMetrics:
+      enabled: true
+    # Events go to the logs pipeline, stream "k8s_events".
+    kubernetesEvents:
+      enabled: true
+
+  extraEnvsFrom:
+    - secretRef:
+        name: otel-collector-openobserve
+
+  # Nothing listens: it only watches the API server and pushes out.
+  ports:
+    otlp:
+      enabled: false
+    otlp-http:
+      enabled: false
+    jaeger-compact:
+      enabled: false
+    jaeger-thrift:
+      enabled: false
+    jaeger-grpc:
+      enabled: false
+    zipkin:
+      enabled: false
+  service:
+    enabled: false
+
+  # alternateConfig for the same reason as the agent: drop upstream defaults.
+  alternateConfig:
+    extensions:
+      health_check:
+        endpoint: ${env:MY_POD_IP}:13133
+    processors:
+      memory_limiter:
+        check_interval: 5s
+        limit_percentage: 80
+        spike_limit_percentage: 25
+      batch: {}
+    exporters:
+      otlp_http/openobserve:
+        endpoint: http://openobserve.openobserve:5080/api/default
+        headers:
+          Authorization: ${env:OPENOBSERVE_AUTH}
+      otlp_http/openobserve-events:
+        endpoint: http://openobserve.openobserve:5080/api/default
+        headers:
+          Authorization: ${env:OPENOBSERVE_AUTH}
+          stream-name: k8s_events
+    service:
+      extensions:
+        - health_check
+      pipelines:
+        # Receivers (k8s_cluster, k8sobjects) come from the presets.
+        metrics:
+          processors:
+            - memory_limiter
+            - batch
+          exporters:
+            - otlp_http/openobserve
+        logs:
+          processors:
+            - memory_limiter
+            - batch
+          exporters:
+            - otlp_http/openobserve-events
 
   resources:
     requests:
