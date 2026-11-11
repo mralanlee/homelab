@@ -1,0 +1,98 @@
+# Sub-chart: opentelemetry-collector
+# (https://open-telemetry.github.io/opentelemetry-helm-charts).
+opentelemetry-collector:
+  fullnameOverride: otel-collector
+
+  # One agent per worker node, tailing /var/log/pods. No toleration for the
+  # control-plane node: its static pods are not what this is for.
+  mode: daemonset
+
+  image:
+    repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s
+
+  presets:
+    # filelog receiver over /var/log/pods, with the read offsets kept on the
+    # node so a restarted agent neither re-sends nor skips lines.
+    logsCollection:
+      enabled: true
+      storeCheckpoints: true
+    # k8s.namespace.name, k8s.pod.name, k8s.job.name, … on every record.
+    kubernetesAttributes:
+      enabled: true
+
+  # OPENOBSERVE_AUTH, built by ESO (templates/openobserve-auth.yaml).
+  extraEnvsFrom:
+    - secretRef:
+        name: otel-collector-openobserve
+
+  # The agent only reads files and pushes out: nothing listens, so no
+  # hostPorts on the nodes.
+  ports:
+    otlp:
+      enabled: false
+    otlp-http:
+      enabled: false
+    jaeger-compact:
+      enabled: false
+    jaeger-thrift:
+      enabled: false
+    jaeger-grpc:
+      enabled: false
+    zipkin:
+      enabled: false
+
+  # alternateConfig, not config: Helm cannot null out a subchart's defaults, so
+  # `config` would keep the upstream OTLP/Jaeger/Zipkin listeners and their
+  # debug pipelines. The presets still add file_log, file_storage and
+  # k8s_attributes to this.
+  alternateConfig:
+    extensions:
+      health_check:
+        endpoint: ${env:MY_POD_IP}:13133
+    receivers:
+      file_log:
+        exclude:
+          # The preset's own exclusion (a list here replaces it).
+          - /var/log/pods/otel-collector_otel-collector*_*/opentelemetry-collector/*.log
+          # lace's control plane exports its own structured logs over OTLP
+          # (mralanlee/lace telemetry/); tailing them too would double them.
+          - /var/log/pods/lace_*/control-plane/*.log
+    processors:
+      memory_limiter:
+        check_interval: 5s
+        limit_percentage: 80
+        spike_limit_percentage: 25
+      batch: {}
+    exporters:
+      otlp_http/openobserve:
+        # Org "default"; the exporter appends /v1/logs.
+        endpoint: http://openobserve.openobserve:5080/api/default
+        headers:
+          Authorization: ${env:OPENOBSERVE_AUTH}
+          # Its own stream, apart from what applications push to "default".
+          stream-name: k8s
+    service:
+      extensions:
+        - health_check
+      pipelines:
+        logs:
+          receivers:
+            - file_log
+          processors:
+            - memory_limiter
+            - batch
+          exporters:
+            - otlp_http/openobserve
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+
+externalSecrets:
+  store: onepassword-sdk
+  # 1Password item (vault shimmer-labs) of the OpenObserve account that
+  # ingests: fields `username` and `password`. The root login for now.
+  ingestUserItem: openobserve-root

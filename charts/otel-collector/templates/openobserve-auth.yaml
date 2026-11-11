@@ -1,0 +1,28 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: otel-collector-openobserve
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: otel-collector
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  refreshInterval: 30h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: {{ .Values.externalSecrets.store }}
+  target:
+    # Read by the agents via extraEnvsFrom.
+    name: otel-collector-openobserve
+    creationPolicy: Owner
+    template:
+      data:
+        OPENOBSERVE_AUTH: {{ `'Basic {{ printf "%s:%s" .username .password | b64enc }}'` }}
+  data:
+    - secretKey: username
+      remoteRef:
+        key: {{ .Values.externalSecrets.ingestUserItem }}/username
+    - secretKey: password
+      remoteRef:
+        key: {{ .Values.externalSecrets.ingestUserItem }}/password
