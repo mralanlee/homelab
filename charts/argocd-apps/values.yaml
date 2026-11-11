@@ -32,6 +32,8 @@ apps:
     namespace: cnpg-system
     path: charts/cn-pg
     syncWave: -10
+    # clusters/poolers CRDs exceed the client-side last-applied annotation limit
+    serverSideApply: true
 
   # Wave 0: core infrastructure
   - name: cilium
@@ -63,6 +65,8 @@ apps:
   - name: external-secrets
     namespace: external-secrets
     path: charts/external-secrets
+    # SecretStore/ClusterSecretStore CRDs exceed the client-side last-applied annotation limit
+    serverSideApply: true
 
   - name: democratic-csi
     namespace: democratic-csi
