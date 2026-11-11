@@ -1,10 +1,18 @@
 # otel-collector
 
-Wraps the upstream `opentelemetry-collector` chart (0.178.3, collector 0.163.2) as a
-DaemonSet that tails every pod's container log on the worker nodes and ships it to
-OpenObserve (`charts/openobserve`), org `default`, stream `k8s`.
+Wraps the upstream `opentelemetry-collector` chart (0.178.3, collector 0.163.2) twice,
+shipping to OpenObserve (`charts/openobserve`), org `default`:
 
-- Logs only. No OTLP/Jaeger/Zipkin listeners and no hostPorts: applications that
+- **agent** (DaemonSet, every worker node): pod container logs → stream `k8s`;
+  `kubeletstats` (node/pod/container CPU, memory, network, fs) and `hostmetrics`
+  (node CPU, load, memory, disk, network; hardened, mounts only /proc and /sys)
+  → metrics streams named after each metric (`k8s_*`, `system_*`)
+- **cluster** (`otel-cluster` alias, one-replica Deployment): `k8s_cluster` metrics
+  (deployment/pod/node state, restarts, quotas) and Kubernetes events → stream
+  `k8s_events`. One replica because these watch the API server; per node they would
+  duplicate
+
+- Logs, metrics and events; no traces. No OTLP/Jaeger/Zipkin listeners and no hostPorts: applications that
   speak OTLP push straight to OpenObserve, as its README says
 - Each record carries `k8s.namespace.name`, `k8s.pod.name`, `k8s.container.name`,
   `k8s.job.name`, … (the `k8s_attributes` processor)
