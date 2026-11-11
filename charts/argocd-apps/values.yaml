@@ -108,3 +108,10 @@ apps:
     namespace: openobserve
     path: charts/openobserve
     syncWave: 10
+
+  # Wave 11: pod-log agent (DaemonSet). Depends on openobserve (its sink) and
+  # external-secrets (ingest credentials).
+  - name: otel-collector
+    namespace: otel-collector
+    path: charts/otel-collector
+    syncWave: 11

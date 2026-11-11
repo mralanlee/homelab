@@ -25,7 +25,8 @@ letter, a digit and a special character.
 
 ## Ingesting telemetry (OTLP)
 
-The service speaks OTLP in-cluster; no extra collector needed:
+The service speaks OTLP in-cluster; applications need no collector in between
+(pod logs are tailed by `charts/otel-collector`):
 
 - HTTP: `http://openobserve.openobserve:5080/api/default/v1/traces` (and `/v1/logs`, `/v1/metrics`)
 - gRPC: `openobserve.openobserve:5081`
