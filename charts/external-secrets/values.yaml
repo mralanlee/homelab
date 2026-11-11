@@ -1,7 +1,4 @@
 external-secrets:
-  grafanaDashboard:
-    enabled: true
-
   metrics.service.enabled: true
 
   serviceMonitor:

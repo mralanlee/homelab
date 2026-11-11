@@ -102,7 +102,6 @@ graph TB
         subgraph HTTPRoutes
             R1[argocd HTTPRoute]
             R2[authentik HTTPRoute]
-            R3[grafana HTTPRoute]
             R4[hubble-ui HTTPRoute]
             R5[prometheus HTTPRoute]
             R6[alertmanager HTTPRoute]
@@ -111,7 +110,6 @@ graph TB
         subgraph Backends
             B1[argocd-server svc]
             B2[authentik-server svc]
-            B3[grafana svc]
             B4[hubble-ui svc]
             B5[prometheus svc]
             B6[alertmanager svc]
@@ -122,7 +120,6 @@ graph TB
     Gateway --> Envoy
     Envoy --> R1 --> B1
     Envoy --> R2 --> B2
-    Envoy --> R3 --> B3
     Envoy --> R4 --> B4
     Envoy --> R5 --> B5
     Envoy --> R6 --> B6
@@ -206,7 +203,7 @@ graph TB
     W30["Wave -30<br/>Gateway API CRDs<br/>experimental channel"]
     W20["Wave -20<br/>prometheus-operator-crds"]
     W10["Wave -10<br/>kube-prometheus-stack<br/>cn-pg"]
-    W0["Wave 0<br/>Cilium, gateway, bind9, external-dns,<br/>cert-manager, external-secrets,<br/>democratic-csi, metrics-server, grafana"]
+    W0["Wave 0<br/>Cilium, gateway, bind9, external-dns,<br/>cert-manager, external-secrets,<br/>democratic-csi, metrics-server"]
     W10p["Wave +10<br/>authentik (depends on cn-pg)"]
 
     W30 --> W20 --> W10 --> W0 --> W10p
@@ -237,7 +234,6 @@ homelab/
     ├── external-secrets/              # 1Password sync
     ├── gateway/                       # Cilium Gateway resource + cert
     ├── gateway-api-crds/              # experimental channel CRDs
-    ├── grafana/
     ├── bind9/                         # authoritative DNS for k8s.shimmerlabs.xyz
     ├── external-dns/                  # writes records to bind9 via RFC2136 TSIG
     ├── kube-prometheus-stack/         # Prom + Alertmanager
@@ -294,5 +290,5 @@ graph TB
 - **Public ingress** — second Gateway with separate IP, OPNsense DNAT, Cloudflare Tunnel or port-forward
 - **external-dns + Cloudflare** — auto-create public DNS records from HTTPRoute hostnames
 - **Authentik IaC** — blueprints for groups/providers/applications instead of UI clicks
-- **Re-enable ServiceMonitors** — for charts disabled during bootstrap (cert-manager, grafana, argocd, traefik gone)
+- **Re-enable ServiceMonitors** — for charts disabled during bootstrap (cert-manager, argocd, traefik gone)
 - **Backup strategy** — Velero for cluster state, cn-pg backups to S3-compatible
