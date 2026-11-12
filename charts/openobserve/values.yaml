@@ -30,6 +30,9 @@ openobserve-standalone:
     ZO_WEB_URL: https://openobserve.k8s.shimmerlabs.xyz
     # Don't phone home.
     ZO_TELEMETRY: "false"
+    # Upstream default is 3650 days, which the 50Gi volume cannot hold.
+    # A stream's own retention setting (UI) overrides this.
+    ZO_COMPACT_DATA_RETENTION_DAYS: "30"
 
   # Scrape OpenObserve's own /metrics with kube-prometheus-stack.
   # prometheus-operator CRDs sync at wave -20, well before this app (wave 10).

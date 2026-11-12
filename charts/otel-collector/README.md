@@ -21,8 +21,9 @@ shipping to OpenObserve (`charts/openobserve`), org `default`:
   nothing older than its first start is shipped
 - Not on the control-plane node (no toleration)
 - Credentials: external-secrets builds the Basic auth header from the 1Password
-  item `openobserve-root` into Secret `otel-collector-openobserve`. Point
-  `externalSecrets.ingestUserItem` at a dedicated ingest user once one exists
+  item `openobserve-ingest` (the dedicated ingest user, not root) into Secret
+  `otel-collector-openobserve`. Both collectors read it at start only: restart
+  the DaemonSet and the `otel-cluster` Deployment after the Secret changes
 
 ## Why it exists
 

@@ -108,6 +108,21 @@ apps:
     namespace: openobserve
     path: charts/openobserve
     syncWave: 10
+    # The upstream chart generates ZO_REPORT_SERVER_SECRET with `lookup`, which
+    # returns nothing under ArgoCD: every render is a new random value, and the
+    # pod-template checksum of it restarted OpenObserve on every repo commit.
+    respectIgnoreDifferences: true
+    ignoreDifferences:
+      - kind: Secret
+        name: openobserve-report-server
+        jsonPointers:
+          - /data
+          - /stringData
+      - group: apps
+        kind: StatefulSet
+        name: openobserve
+        jsonPointers:
+          - /spec/template/metadata/annotations/checksum~1report-server-secret
 
   # Wave 11: pod-log agent (DaemonSet). Depends on openobserve (its sink) and
   # external-secrets (ingest credentials).

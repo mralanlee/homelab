@@ -33,6 +33,10 @@ spec:
       {{- if .replaceLargeCRDs }}
       - Replace=true
       {{- end }}
+      {{- if .respectIgnoreDifferences }}
+      # Without this a sync still writes the ignored fields.
+      - RespectIgnoreDifferences=true
+      {{- end }}
   {{- with .ignoreDifferences }}
   ignoreDifferences:
 {{ toYaml . | indent 4 }}

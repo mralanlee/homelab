@@ -201,5 +201,6 @@ otel-cluster:
 externalSecrets:
   store: onepassword-sdk
   # 1Password item (vault shimmer-labs) of the OpenObserve account that
-  # ingests: fields `username` and `password`. The root login for now.
-  ingestUserItem: openobserve-root
+  # ingests: fields `username` and `password`. A dedicated user, not root
+  # (role admin: the open-source build has no lower role).
+  ingestUserItem: openobserve-ingest
